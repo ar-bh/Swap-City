@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://cq6hkunvxgt6r"]
+
+[sub_resource type="Environment" id="Environment_mn11d"]
+background_mode = 1
+background_color = Color(0.54901963, 0.78039217, 0.98039216, 1)
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 0.55
+
+[node name="TestLevel" type="Node3D" unique_id=1204462459]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=772022164]
+environment = SubResource("Environment_mn11d")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1185981636]
+transform = Transform3D(0.8660254, -0.38302222, 0.32139382, 0, 0.64278764, 0.76604444, -0.5, -0.66341394, 0.5566704, 0, 0, 0)
+shadow_enabled = true
+
+[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=1886565669]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+use_collision = true
+size = Vector3(6.844, 2, 6.833)

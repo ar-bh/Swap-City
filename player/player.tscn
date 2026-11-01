@@ -1,0 +1,201 @@
+[gd_scene format=3 uid="uid://uhemq6uhi44u"]
+
+[ext_resource type="PackedScene" uid="uid://vkwma6snsjag" path="res://assets/blob.glb" id="1_oul6g"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mn11d"]
+radius = 1.1
+height = 3.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oul6g"]
+albedo_color = Color(1, 1, 0, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_mn11d"]
+material = SubResource("StandardMaterial3D_oul6g")
+size = Vector2(0.5, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rkbax"]
+albedo_color = Color(0, 0, 1, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_g1dw6"]
+material = SubResource("StandardMaterial3D_rkbax")
+size = Vector2(0.5, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iemch"]
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_mn11d"]
+material = SubResource("StandardMaterial3D_iemch")
+radius = 0.25
+height = 0.5
+
+[node name="Player" type="CharacterBody3D" unique_id=179349838]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1635119416]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
+shape = SubResource("CapsuleShape3D_mn11d")
+
+[node name="Blob" parent="." unique_id=2044517352 instance=ExtResource("1_oul6g")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.45, 0)
+
+[node name="Skeleton" type="Skeleton3D" parent="Blob" unique_id=1317010121]
+bones/0/name = "RightHip"
+bones/0/parent = -1
+bones/0/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.32, -0.79, 0)
+bones/0/enabled = true
+bones/0/position = Vector3(-0.32, -0.79, 0)
+bones/0/rotation = Quaternion(0, 0, 0, 1)
+bones/0/scale = Vector3(1, 1, 1)
+bones/1/name = "RightKnee"
+bones/1/parent = 0
+bones/1/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.37, -0.68, 0.13)
+bones/1/enabled = true
+bones/1/position = Vector3(-0.37, -0.68, 0.13)
+bones/1/rotation = Quaternion(0, 0, 0, 1)
+bones/1/scale = Vector3(1, 1, 1)
+bones/2/name = "RightFoot"
+bones/2/parent = 1
+bones/2/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.16, -0.98, -0.11)
+bones/2/enabled = true
+bones/2/position = Vector3(-0.16, -0.98, -0.11)
+bones/2/rotation = Quaternion(0, 0, 0, 1)
+bones/2/scale = Vector3(1, 1, 1)
+bones/3/name = "RightShoulder"
+bones/3/parent = -1
+bones/3/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, 0.26, 0.08)
+bones/3/enabled = true
+bones/3/position = Vector3(-0.62, 0.26, 0.08)
+bones/3/rotation = Quaternion(0, 0, 0, 1)
+bones/3/scale = Vector3(1, 1, 1)
+bones/4/name = "RightElbow"
+bones/4/parent = 3
+bones/4/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35, -0.26, 0.08)
+bones/4/enabled = true
+bones/4/position = Vector3(-0.35, -0.26, 0.08)
+bones/4/rotation = Quaternion(0, 0, 0, 1)
+bones/4/scale = Vector3(1, 1, 1)
+bones/5/name = "RightHand"
+bones/5/parent = 4
+bones/5/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, -0.65, -0.02)
+bones/5/enabled = true
+bones/5/position = Vector3(-0.06, -0.65, -0.02)
+bones/5/rotation = Quaternion(0, 0, 0, 1)
+bones/5/scale = Vector3(1, 1, 1)
+bones/6/name = "LeftHip"
+bones/6/parent = -1
+bones/6/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, -0.79, 0)
+bones/6/enabled = true
+bones/6/position = Vector3(0.32, -0.79, 0)
+bones/6/rotation = Quaternion(0, 0, 0, 1)
+bones/6/scale = Vector3(1, 1, 1)
+bones/7/name = "LeftKnee"
+bones/7/parent = 6
+bones/7/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.37, -0.68, 0.13)
+bones/7/enabled = true
+bones/7/position = Vector3(0.37, -0.68, 0.13)
+bones/7/rotation = Quaternion(0, 0, 0, 1)
+bones/7/scale = Vector3(1, 1, 1)
+bones/8/name = "LeftFoot"
+bones/8/parent = 7
+bones/8/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16, -0.98, -0.11)
+bones/8/enabled = true
+bones/8/position = Vector3(0.16, -0.98, -0.11)
+bones/8/rotation = Quaternion(0, 0, 0, 1)
+bones/8/scale = Vector3(1, 1, 1)
+bones/9/name = "LeftShoulder"
+bones/9/parent = -1
+bones/9/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 0.26, 0.08)
+bones/9/enabled = true
+bones/9/position = Vector3(0.62, 0.26, 0.08)
+bones/9/rotation = Quaternion(0, 0, 0, 1)
+bones/9/scale = Vector3(1, 1, 1)
+bones/10/name = "LeftElbow"
+bones/10/parent = 9
+bones/10/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, -0.26, 0.08)
+bones/10/enabled = true
+bones/10/position = Vector3(0.35, -0.26, 0.08)
+bones/10/rotation = Quaternion(0, 0, 0, 1)
+bones/10/scale = Vector3(1, 1, 1)
+bones/11/name = "LeftHand"
+bones/11/parent = 10
+bones/11/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06, -0.65, -0.02)
+bones/11/enabled = true
+bones/11/position = Vector3(0.06, -0.65, -0.02)
+bones/11/rotation = Quaternion(0, 0, 0, 1)
+bones/11/scale = Vector3(1, 1, 1)
+
+[node name="RightFootTarget" type="Marker3D" parent="Blob/Skeleton" unique_id=1981583864]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.66, -2.45, 0.02)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/RightFootTarget" unique_id=1150340622]
+mesh = SubResource("PlaneMesh_mn11d")
+
+[node name="LeftFootTarget" type="Marker3D" parent="Blob/Skeleton" unique_id=2138899389]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.66, -2.45, 0.02)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/LeftFootTarget" unique_id=1633465343]
+mesh = SubResource("PlaneMesh_mn11d")
+
+[node name="RightConstant" type="Marker3D" parent="Blob/Skeleton" unique_id=94045216]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.66, -2.45, 0.02)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/RightConstant" unique_id=93688021]
+mesh = SubResource("PlaneMesh_g1dw6")
+
+[node name="LeftConstant" type="Marker3D" parent="Blob/Skeleton" unique_id=1753506543]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.66, -2.45, 0.02)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/LeftConstant" unique_id=1346860386]
+mesh = SubResource("PlaneMesh_g1dw6")
+
+[node name="RightPole" type="Marker3D" parent="Blob/Skeleton" unique_id=153144307]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.72, -1.47, 1)
+
+[node name="LeftPole" type="Marker3D" parent="Blob/Skeleton" unique_id=634620596]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.72, -1.47, 1)
+
+[node name="RightShoe" type="BoneAttachment3D" parent="Blob/Skeleton" unique_id=1995148426]
+transform = Transform3D(0.96210206, 0.0016931146, -0.27268445, -0.031684533, 0.9939016, -0.105620205, 0.27084267, 0.1102573, 0.95628846, -0.66, -2.45, 0.019999951)
+bone_name = "RightFoot"
+bone_idx = 2
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/RightShoe" unique_id=2139682608]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.007, 0.23, 0.05)
+mesh = SubResource("SphereMesh_mn11d")
+
+[node name="LeftShoe" type="BoneAttachment3D" parent="Blob/Skeleton" unique_id=877240386]
+transform = Transform3D(0.993372, 0.045850504, -0.10540254, -0.062633306, 0.98481894, -0.16189116, 0.09637962, 0.16741987, 0.9811634, 0.6600001, -2.45, 0.019999921)
+bone_name = "LeftFoot"
+bone_idx = 8
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/LeftShoe" unique_id=1408272822]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.007, 0.23, 0.05)
+mesh = SubResource("SphereMesh_mn11d")
+
+[node name="TwoBoneIK3D" type="TwoBoneIK3D" parent="Blob/Skeleton" unique_id=418578583]
+setting_count = 2
+settings/0/target_node = NodePath("../RightFootTarget")
+settings/0/pole_node = NodePath("../RightPole")
+settings/0/root_bone_name = "RightHip"
+settings/0/root_bone = 0
+settings/0/middle_bone_name = "RightKnee"
+settings/0/middle_bone = 1
+settings/0/pole_direction = 5
+settings/0/end_bone_name = "RightFoot"
+settings/0/end_bone = 2
+settings/0/use_virtual_end = false
+settings/0/extend_end_bone = false
+settings/1/target_node = NodePath("../LeftFootTarget")
+settings/1/pole_node = NodePath("../LeftPole")
+settings/1/root_bone_name = "LeftHip"
+settings/1/root_bone = 6
+settings/1/middle_bone_name = "LeftKnee"
+settings/1/middle_bone = 7
+settings/1/pole_direction = 0
+settings/1/end_bone_name = "LeftFoot"
+settings/1/end_bone = 8
+settings/1/use_virtual_end = false
+settings/1/extend_end_bone = false
