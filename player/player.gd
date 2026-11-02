@@ -30,6 +30,12 @@ extends CharacterBody3D
 @export var min_pitch := -60.0
 @export var max_pitch := 40.0
 
+@export_group("Shot")
+@export var shot_range := 80.0
+@export var tracer_time := 0.06
+@export var bullet_color := Color(1.0, 0.945, 0.69, 1.0)
+@export_range(0.005, 0.3, 0.005) var bullet_width := 0.035
+
 var _bob := 0.0
 var _bob_amount := 0.0
 var _model_rest_y := 0.0
@@ -48,6 +54,12 @@ var _mesh_rest := {}
 @onready var _camera_pitch: Node3D = $CameraYaw/CameraPitch
 @onready var _spring_arm: SpringArm3D = $CameraYaw/CameraPitch/SpringArm3D
 
+@onready var _camera: Camera3D = %Camera3D
+@onready var _muzzle: Marker3D = %Muzzle
+@onready var _muzzle_flash: GPUParticles3D = %MuzzleFlash
+@onready var _hit_spark: GPUParticles3D = %HitSpark
+@onready var _tracer: MeshInstance3D = $Tracer
+
 func _ready() -> void:
 	_model_rest_y = _model.position.y
 	_model.rotation.y = _face_yaw()
@@ -58,6 +70,9 @@ func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("shoot") and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		_shoot()
+		return
 	if event.is_action_pressed("ui_cancel"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	elif event is InputEventMouseButton and event.pressed:
@@ -140,3 +155,63 @@ func _bob_body(delta: float, move: Vector3) -> void:
 	_dip_vel += (-dip_spring * _dip - dip_damping * _dip_vel) * delta
 	_dip += _dip_vel * delta
 	_model.position.y = _model_rest_y + absf(sin(_bob)) * _bob_amount + _dip
+
+func _shoot() -> void:
+	var aim := _camera_hit()
+	var from := _muzzle.global_position
+	var travel := aim - from
+	if travel.length_squared() < 0.0001:
+		return
+	var direction := travel.normalized()
+	var start := from + direction * 0.2
+	var hit := _raycast(start, start + direction * shot_range)
+	var end := start + direction * shot_range
+	if not hit.is_empty():
+		end = hit.position
+	_play_burst(_muzzle_flash)
+	_show_tracer(start, end)
+	if hit.is_empty():
+		return
+	_hit_spark.global_position = hit.position
+	_aim_along(_hit_spark, hit.normal)
+	_play_burst(_hit_spark)
+	print("Hit ", hit.collider.name)
+
+func _camera_hit() -> Vector3:
+	var from := _camera.global_position
+	var to := from + _camera.global_basis * Vector3(0.0, 0.0, -shot_range)
+	var hit := _raycast(from, to)
+	if hit.is_empty():
+		return to
+	return hit.position
+
+func _raycast(from: Vector3, to: Vector3) -> Dictionary:
+	var query := PhysicsRayQueryParameters3D.create(from, to)
+	query.exclude = [get_rid()]
+	return get_world_3d().direct_space_state.intersect_ray(query)
+
+func _aim_along(node: Node3D, direction: Vector3) -> void:
+	var up := Vector3.RIGHT if absf(direction.normalized().dot(Vector3.UP)) > 0.99 else Vector3.UP
+	node.look_at(node.global_position + direction, up)
+
+func _play_burst(particles: GPUParticles3D) -> void:
+	particles.emitting = false
+	particles.restart()
+	particles.emitting = true
+
+func _show_tracer(from: Vector3, to: Vector3) -> void:
+	var length := from.distance_to(to)
+	if length < 0.05:
+		return
+	_tracer.visible = true
+	_tracer.global_position = (from + to) * 0.5
+	_aim_along(_tracer, to - from)
+	var thickness := bullet_width / 0.035
+	_tracer.scale = Vector3(thickness, thickness, length)
+	var mat := _tracer.get_active_material(0) as StandardMaterial3D
+	mat.albedo_color = bullet_color
+	mat.emission = Color(bullet_color.r, bullet_color.g, bullet_color.b, 1.0)
+	var tween := create_tween()
+	tween.tween_property(mat, "albedo_color:a", 0.0, tracer_time)
+	tween.tween_callback(func() -> void:
+		_tracer.visible = false)

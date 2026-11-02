@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://dsr74he67wvih" path="res://player/outline.gd" id="3_g6k8r"]
 [ext_resource type="Material" uid="uid://comcoe0e71vmy" path="res://shaders/outline_material.tres" id="4_boad6"]
 [ext_resource type="PackedScene" uid="uid://bcs0k7ahaw7gn" path="res://assets/space_gun.glb" id="4_gun"]
+[ext_resource type="Texture2D" uid="uid://s4ejwlxbccnr" path="res://assets/crosshair.png" id="8_rgyib"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mn11d"]
 radius = 1.1
@@ -50,6 +51,38 @@ _data = {
 }
 point_count = 12
 
+[sub_resource type="Gradient" id="Gradient_muzzle"]
+colors = PackedColorArray(1, 0.8901961, 0.5411765, 1, 1, 0.8901961, 0.5411765, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_muzzle"]
+gradient = SubResource("Gradient_muzzle")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_mn11d"]
+emission_shape = 1
+emission_sphere_radius = 0.04
+direction = Vector3(0, 0, 1)
+spread = 28.0
+initial_velocity_min = 2.5
+initial_velocity_max = 5.0
+gravity = Vector3(0, 0, 0)
+damping_min = 6.0000005
+damping_max = 8.0
+scale_min = 0.4
+color = Color(1, 0.8901961, 0.5411765, 1)
+color_ramp = SubResource("GradientTexture1D_muzzle")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spark"]
+transparency = 1
+shading_mode = 0
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_iemch"]
+material = SubResource("StandardMaterial3D_spark")
+size = Vector2(0.12, 0.12)
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7glny"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_iemch"]
@@ -74,8 +107,45 @@ point_count = 12
 [sub_resource type="SphereShape3D" id="SphereShape3D_mn11d"]
 radius = 0.3
 
+[sub_resource type="Gradient" id="Gradient_hit"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_hit"]
+gradient = SubResource("Gradient_hit")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_hit"]
+emission_shape = 1
+emission_sphere_radius = 0.02
+direction = Vector3(0, 0, -1)
+spread = 55.0
+initial_velocity_min = 1.5
+initial_velocity_max = 4.0
+gravity = Vector3(0, -4, 0)
+damping_min = 2.0
+damping_max = 3.0
+scale_min = 0.35
+scale_max = 0.9
+color_ramp = SubResource("GradientTexture1D_hit")
+
+[sub_resource type="QuadMesh" id="QuadMesh_hit"]
+material = SubResource("StandardMaterial3D_spark")
+size = Vector2(0.08, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tracer"]
+resource_local_to_scene = true
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.94509804, 0.6901961, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tracer"]
+material = SubResource("StandardMaterial3D_tracer")
+size = Vector3(0.035, 0.035, 1)
+
 [node name="Player" type="CharacterBody3D" unique_id=179349838]
 script = ExtResource("1_yw30f")
+tracer_time = 0.3
+bullet_color = Color(0.6762247, 1.0636896e-05, 0.46149915, 1)
+bullet_width = 0.07500000000000001
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1635119416]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
@@ -334,6 +404,21 @@ unique_name_in_owner = true
 [node name="SpaceGun" parent="Blob/Skeleton/ArmAim/RightHandTarget/GunMount" unique_id=691267984 instance=ExtResource("4_gun")]
 transform = Transform3D(0, 0, 2.6, 0, 2.6, 0, -2.6, 0, 0, 0, 0.19, 0.09)
 
+[node name="Muzzle" type="Marker3D" parent="Blob/Skeleton/ArmAim/RightHandTarget/GunMount" unique_id=83482237]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2692678, 0.6984763)
+
+[node name="MuzzleFlash" type="GPUParticles3D" parent="Blob/Skeleton/ArmAim/RightHandTarget/GunMount/Muzzle" unique_id=1819767480]
+unique_name_in_owner = true
+emitting = false
+amount = 10
+lifetime = 0.12
+one_shot = true
+explosiveness = 1.0
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_mn11d")
+draw_pass_1 = SubResource("QuadMesh_iemch")
+
 [node name="RightArmPole" type="Marker3D" parent="Blob/Skeleton/ArmAim" unique_id=1809904038]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, -1, 0.2)
 
@@ -418,4 +503,41 @@ spring_length = 5.5
 margin = 0.2
 
 [node name="Camera3D" type="Camera3D" parent="CameraYaw/CameraPitch/SpringArm3D" unique_id=2073718743]
+unique_name_in_owner = true
 current = true
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=339624546]
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer" unique_id=766142893]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -12.0
+offset_top = -12.0
+offset_right = 12.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("8_rgyib")
+expand_mode = 1
+
+[node name="HitSpark" type="GPUParticles3D" parent="." unique_id=1819767481]
+unique_name_in_owner = true
+top_level = true
+emitting = false
+amount = 18
+lifetime = 0.28
+one_shot = true
+explosiveness = 1.0
+visibility_aabb = AABB(-2, -2, -2, 4, 4, 4)
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_hit")
+draw_pass_1 = SubResource("QuadMesh_hit")
+
+[node name="Tracer" type="MeshInstance3D" parent="." unique_id=1819767482]
+top_level = true
+visible = false
+mesh = SubResource("BoxMesh_tracer")
