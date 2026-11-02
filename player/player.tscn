@@ -177,6 +177,7 @@ unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.66, -2.45, 0.02)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/RightFootTarget" unique_id=1150340622]
+visible = false
 mesh = SubResource("PlaneMesh_mn11d")
 
 [node name="LeftFootTarget" type="Marker3D" parent="Blob/Skeleton" unique_id=2138899389]
@@ -184,6 +185,7 @@ unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.66, -2.45, 0.02)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/LeftFootTarget" unique_id=1633465343]
+visible = false
 mesh = SubResource("PlaneMesh_mn11d")
 
 [node name="RightConstant" type="Marker3D" parent="Blob/Skeleton" unique_id=94045216]
@@ -191,6 +193,7 @@ unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.66, -2.45, 0.02)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/RightConstant" unique_id=93688021]
+visible = false
 mesh = SubResource("PlaneMesh_g1dw6")
 
 [node name="LeftConstant" type="Marker3D" parent="Blob/Skeleton" unique_id=1753506543]
@@ -198,6 +201,7 @@ unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.66, -2.45, 0.02)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/LeftConstant" unique_id=1346860386]
+visible = false
 mesh = SubResource("PlaneMesh_g1dw6")
 
 [node name="RightPole" type="Marker3D" parent="Blob/Skeleton" unique_id=153144307]
@@ -213,6 +217,7 @@ bone_idx = 2
 
 [node name="Mesh" type="MeshInstance3D" parent="Blob/Skeleton/RightShoe" unique_id=2139682608]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07, 0.23, 0.05)
+material_overlay = ExtResource("4_boad6")
 mesh = SubResource("SphereMesh_mn11d")
 
 [node name="LeftShoe" type="BoneAttachment3D" parent="Blob/Skeleton" unique_id=877240386]
@@ -222,6 +227,7 @@ bone_idx = 8
 
 [node name="Mesh" type="MeshInstance3D" parent="Blob/Skeleton/LeftShoe" unique_id=1408272822]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07, 0.23, 0.05)
+material_overlay = ExtResource("4_boad6")
 mesh = SubResource("SphereMesh_mn11d")
 
 [node name="TwoBoneIK3D" type="TwoBoneIK3D" parent="Blob/Skeleton" unique_id=418578583]
@@ -278,6 +284,7 @@ script = ExtResource("2_rkbax")
 curve = SubResource("Curve3D_g1dw6")
 
 [node name="RightTube" type="CSGPolygon3D" parent="Blob/Skeleton/Legs" unique_id=1023651717]
+material_overlay = ExtResource("4_boad6")
 polygon = PackedVector2Array(-0.14, 0, -0.11326238, -0.082289934, -0.04326238, -0.13314791, 0.04326238, -0.13314791, 0.11326238, -0.082289934, 0.14, -1.7145055e-17, 0.11326238, 0.082289934, 0.04326238, 0.13314791, -0.04326238, 0.13314791, -0.11326238, 0.082289934)
 mode = 2
 path_node = NodePath("../RightPath")
@@ -297,6 +304,7 @@ material = SubResource("StandardMaterial3D_mn11d")
 curve = SubResource("Curve3D_yw30f")
 
 [node name="LeftTube" type="CSGPolygon3D" parent="Blob/Skeleton/Legs" unique_id=90628511]
+material_overlay = ExtResource("4_boad6")
 polygon = PackedVector2Array(-0.14, 0, -0.11326238, -0.082289934, -0.04326238, -0.13314791, 0.04326238, -0.13314791, 0.11326238, -0.082289934, 0.14, -1.7145055e-17, 0.11326238, 0.082289934, 0.04326238, 0.13314791, -0.04326238, 0.13314791, -0.11326238, 0.082289934)
 mode = 2
 path_node = NodePath("../LeftPath")
@@ -336,6 +344,7 @@ bone_idx = 5
 
 [node name="Mesh" type="MeshInstance3D" parent="Blob/Skeleton/RightGlove" unique_id=801139837]
 transform = Transform3D(0.97508496, 0, 0, 0, 0.97508496, 0, 0, 0, 0.97508496, 0, 0, 0)
+material_overlay = ExtResource("4_boad6")
 mesh = SubResource("SphereMesh_iemch")
 
 [node name="LeftHandTarget" type="Marker3D" parent="Blob/Skeleton" unique_id=936628940]
@@ -351,6 +360,7 @@ bone_name = "LeftHand"
 bone_idx = 11
 
 [node name="Mesh" type="MeshInstance3D" parent="Blob/Skeleton/LeftGlove" unique_id=697429735]
+material_overlay = ExtResource("4_boad6")
 mesh = SubResource("SphereMesh_iemch")
 
 [node name="Arms" type="Node3D" parent="Blob/Skeleton" unique_id=1376044053]
@@ -360,6 +370,7 @@ script = ExtResource("3_g1dw6")
 curve = SubResource("Curve3D_qjkh3")
 
 [node name="RightTube" type="CSGPolygon3D" parent="Blob/Skeleton/Arms" unique_id=1027383391]
+material_overlay = ExtResource("4_boad6")
 polygon = PackedVector2Array(-0.14, 0, -0.11326238, -0.082289934, -0.04326238, -0.13314791, 0.04326238, -0.13314791, 0.11326238, -0.082289934, 0.14, -1.7145055e-17, 0.11326238, 0.082289934, 0.04326238, 0.13314791, -0.04326238, 0.13314791, -0.11326238, 0.082289934)
 mode = 2
 path_node = NodePath("../RightPath")
@@ -379,6 +390,7 @@ material = SubResource("StandardMaterial3D_mn11d")
 curve = SubResource("Curve3D_leftarm")
 
 [node name="LeftTube" type="CSGPolygon3D" parent="Blob/Skeleton/Arms" unique_id=161593747]
+material_overlay = ExtResource("4_boad6")
 polygon = PackedVector2Array(-0.14, 0, -0.11326238, -0.082289934, -0.04326238, -0.13314791, 0.04326238, -0.13314791, 0.11326238, -0.082289934, 0.14, -1.7145055e-17, 0.11326238, 0.082289934, 0.04326238, 0.13314791, -0.04326238, 0.13314791, -0.11326238, 0.082289934)
 mode = 2
 path_node = NodePath("../LeftPath")

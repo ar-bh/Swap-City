@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="swapcity"
-run/main_scene="uid://cq6hkunvxgt6r"
+run/main_scene="res://levels/superhot_arena.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 

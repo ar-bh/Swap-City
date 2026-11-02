@@ -1,0 +1,204 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://uhemq6uhi44u" path="res://player/player.tscn" id="1_player"]
+[ext_resource type="Texture2D" uid="uid://fr63adwhxaxr" path="res://assets/kenney_prototype-textures/PNG/Dark/texture_01.png" id="3_dark"]
+[ext_resource type="Texture2D" path="res://assets/kenney_prototype-textures/PNG/Red/texture_12.png" id="4_door"]
+
+[sub_resource type="Environment" id="Environment_arena"]
+background_mode = 1
+background_color = Color(0.9, 0.91, 0.93, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.92, 0.95, 1, 1)
+ambient_light_energy = 0.55
+tonemap_mode = 2
+
+[sub_resource type="StandardMaterial3D" id="Mat_Floor"]
+albedo_color = Color(1.3, 1.32, 1.38, 1)
+albedo_texture = ExtResource("3_dark")
+roughness = 1.0
+uv1_scale = Vector3(0.25, 0.25, 0.25)
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5
+
+[sub_resource type="StandardMaterial3D" id="Mat_Wall"]
+albedo_color = Color(3.6, 3.6, 3.65, 1)
+albedo_texture = ExtResource("3_dark")
+roughness = 1.0
+uv1_scale = Vector3(0.25, 0.25, 0.25)
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5
+
+[sub_resource type="StandardMaterial3D" id="Mat_Ceiling"]
+albedo_color = Color(2.7, 2.7, 2.75, 1)
+albedo_texture = ExtResource("3_dark")
+roughness = 1.0
+uv1_scale = Vector3(0.25, 0.25, 0.25)
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5
+
+[sub_resource type="StandardMaterial3D" id="Mat_Structure"]
+albedo_texture = ExtResource("3_dark")
+roughness = 1.0
+uv1_scale = Vector3(0.5, 0.5, 0.5)
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5
+
+[sub_resource type="StandardMaterial3D" id="Mat_Door"]
+albedo_texture = ExtResource("4_door")
+roughness = 1.0
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="Quad_Door"]
+material = SubResource("Mat_Door")
+size = Vector2(6, 6)
+
+[node name="SuperhotArena" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_arena")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.8660254, -0.4698463, 0.1710101, 0, 0.3420201, 0.9396926, -0.5, -0.8137977, 0.2961981, 0, 12, 0)
+light_energy = 0.22
+shadow_enabled = true
+shadow_blur = 1.5
+directional_shadow_max_distance = 90.0
+
+[node name="Room" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Room"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(62, 1, 46)
+material = SubResource("Mat_Floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Room"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.5, 0)
+cast_shadow = 0
+use_collision = true
+size = Vector3(62, 1, 46)
+material = SubResource("Mat_Ceiling")
+
+[node name="NorthWall" type="CSGBox3D" parent="Room"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, -22.5)
+cast_shadow = 0
+use_collision = true
+size = Vector3(62, 13, 1)
+material = SubResource("Mat_Wall")
+
+[node name="SouthWall" type="CSGBox3D" parent="Room"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, 22.5)
+cast_shadow = 0
+use_collision = true
+size = Vector3(62, 13, 1)
+material = SubResource("Mat_Wall")
+
+[node name="WestWall" type="CSGBox3D" parent="Room"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.5, 6.5, 0)
+cast_shadow = 0
+use_collision = true
+size = Vector3(1, 13, 44)
+material = SubResource("Mat_Wall")
+
+[node name="EastWall" type="CSGBox3D" parent="Room"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.5, 6.5, 0)
+cast_shadow = 0
+use_collision = true
+size = Vector3(1, 13, 44)
+material = SubResource("Mat_Wall")
+
+[node name="Balcony" type="Node3D" parent="Room"]
+
+[node name="Deck" type="CSGBox3D" parent="Room/Balcony"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.75, -18)
+use_collision = true
+size = Vector3(60, 0.5, 8)
+material = SubResource("Mat_Floor")
+
+[node name="Railing" type="CSGBox3D" parent="Room/Balcony"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.75, -14.25)
+use_collision = true
+size = Vector3(48, 1.5, 0.5)
+material = SubResource("Mat_Wall")
+
+[node name="RailingCap" type="CSGBox3D" parent="Room/Balcony"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.55, -14.25)
+use_collision = true
+size = Vector3(48.2, 0.1, 0.7)
+material = SubResource("Mat_Structure")
+
+[node name="Column1" type="CSGBox3D" parent="Room/Balcony"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 2.75, -14.75)
+use_collision = true
+size = Vector3(1.5, 5.5, 1.5)
+material = SubResource("Mat_Structure")
+
+[node name="Column2" type="CSGBox3D" parent="Room/Balcony"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2.75, -14.75)
+use_collision = true
+size = Vector3(1.5, 5.5, 1.5)
+material = SubResource("Mat_Structure")
+
+[node name="Column3" type="CSGBox3D" parent="Room/Balcony"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2.75, -14.75)
+use_collision = true
+size = Vector3(1.5, 5.5, 1.5)
+material = SubResource("Mat_Structure")
+
+[node name="Column4" type="CSGBox3D" parent="Room/Balcony"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 2.75, -14.75)
+use_collision = true
+size = Vector3(1.5, 5.5, 1.5)
+material = SubResource("Mat_Structure")
+
+[node name="RampWest" type="CSGPolygon3D" parent="Room/Balcony"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -24, 0, 0)
+use_collision = true
+polygon = PackedVector2Array(4, 0, 14, 0, 14, 6, 13.5, 6)
+depth = 6
+material = SubResource("Mat_Floor")
+
+[node name="RampEast" type="CSGPolygon3D" parent="Room/Balcony"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 30, 0, 0)
+use_collision = true
+polygon = PackedVector2Array(4, 0, 14, 0, 14, 6, 13.5, 6)
+depth = 6
+material = SubResource("Mat_Floor")
+
+[node name="ExitDoor" type="MeshInstance3D" parent="Room/Balcony"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9, -21.98)
+cast_shadow = 0
+mesh = SubResource("Quad_Door")
+
+[node name="Partitions" type="Node3D" parent="Room"]
+
+[node name="PartitionWest" type="CSGBox3D" parent="Room/Partitions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 1.5, 3)
+use_collision = true
+size = Vector3(10, 3, 1)
+material = SubResource("Mat_Wall")
+
+[node name="PartitionWestCap" type="CSGBox3D" parent="Room/Partitions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 3.05, 3)
+use_collision = true
+size = Vector3(10.2, 0.1, 1.2)
+material = SubResource("Mat_Structure")
+
+[node name="PartitionEast" type="CSGBox3D" parent="Room/Partitions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 1.5, 3)
+use_collision = true
+size = Vector3(10, 3, 1)
+material = SubResource("Mat_Wall")
+
+[node name="PartitionEastCap" type="CSGBox3D" parent="Room/Partitions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 3.05, 3)
+use_collision = true
+size = Vector3(10.2, 0.1, 1.2)
+material = SubResource("Mat_Structure")
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 16)
