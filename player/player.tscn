@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://uhemq6uhi44u"]
 
 [ext_resource type="PackedScene" uid="uid://vkwma6snsjag" path="res://assets/blob.glb" id="1_oul6g"]
+[ext_resource type="Script" uid="uid://ryvfxgcjgc8l" path="res://player/legs.gd" id="2_rkbax"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mn11d"]
 radius = 1.1
@@ -27,6 +28,12 @@ albedo_color = Color(0, 0, 0, 1)
 material = SubResource("StandardMaterial3D_iemch")
 radius = 0.25
 height = 0.5
+
+[sub_resource type="Curve3D" id="Curve3D_g1dw6"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mn11d"]
+
+[sub_resource type="Curve3D" id="Curve3D_yw30f"]
 
 [node name="Player" type="CharacterBody3D" unique_id=179349838]
 
@@ -162,8 +169,8 @@ transform = Transform3D(0.96210206, 0.0016931146, -0.27268445, -0.031684533, 0.9
 bone_name = "RightFoot"
 bone_idx = 2
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/RightShoe" unique_id=2139682608]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.007, 0.23, 0.05)
+[node name="Mesh" type="MeshInstance3D" parent="Blob/Skeleton/RightShoe" unique_id=2139682608]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07, 0.23, 0.05)
 mesh = SubResource("SphereMesh_mn11d")
 
 [node name="LeftShoe" type="BoneAttachment3D" parent="Blob/Skeleton" unique_id=877240386]
@@ -171,8 +178,8 @@ transform = Transform3D(0.993372, 0.045850504, -0.10540254, -0.062633306, 0.9848
 bone_name = "LeftFoot"
 bone_idx = 8
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/LeftShoe" unique_id=1408272822]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.007, 0.23, 0.05)
+[node name="Mesh" type="MeshInstance3D" parent="Blob/Skeleton/LeftShoe" unique_id=1408272822]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07, 0.23, 0.05)
 mesh = SubResource("SphereMesh_mn11d")
 
 [node name="TwoBoneIK3D" type="TwoBoneIK3D" parent="Blob/Skeleton" unique_id=418578583]
@@ -194,8 +201,49 @@ settings/1/root_bone_name = "LeftHip"
 settings/1/root_bone = 6
 settings/1/middle_bone_name = "LeftKnee"
 settings/1/middle_bone = 7
-settings/1/pole_direction = 0
+settings/1/pole_direction = 5
 settings/1/end_bone_name = "LeftFoot"
 settings/1/end_bone = 8
 settings/1/use_virtual_end = false
 settings/1/extend_end_bone = false
+
+[node name="Legs" type="Node3D" parent="Blob/Skeleton" unique_id=1455230120]
+script = ExtResource("2_rkbax")
+
+[node name="RightPath" type="Path3D" parent="Blob/Skeleton/Legs" unique_id=2025011973]
+curve = SubResource("Curve3D_g1dw6")
+
+[node name="RightTube" type="CSGPolygon3D" parent="Blob/Skeleton/Legs" unique_id=1023651717]
+polygon = PackedVector2Array(-0.14, 0, -0.11326238, -0.082289934, -0.04326238, -0.13314791, 0.04326238, -0.13314791, 0.11326238, -0.082289934, 0.14, -1.7145055e-17, 0.11326238, 0.082289934, 0.04326238, 0.13314791, -0.04326238, 0.13314791, -0.11326238, 0.082289934)
+mode = 2
+path_node = NodePath("../RightPath")
+path_interval_type = 0
+path_interval = 0.04
+path_simplify_angle = 0.0
+path_rotation = 2
+path_rotation_accurate = true
+path_local = true
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
+smooth_faces = true
+material = SubResource("StandardMaterial3D_mn11d")
+
+[node name="LeftPath" type="Path3D" parent="Blob/Skeleton/Legs" unique_id=697892305]
+curve = SubResource("Curve3D_yw30f")
+
+[node name="LeftTube" type="CSGPolygon3D" parent="Blob/Skeleton/Legs" unique_id=90628511]
+polygon = PackedVector2Array(-0.14, 0, -0.11326238, -0.082289934, -0.04326238, -0.13314791, 0.04326238, -0.13314791, 0.11326238, -0.082289934, 0.14, -1.7145055e-17, 0.11326238, 0.082289934, 0.04326238, 0.13314791, -0.04326238, 0.13314791, -0.11326238, 0.082289934)
+mode = 2
+path_node = NodePath("../LeftPath")
+path_interval_type = 0
+path_interval = 0.04
+path_simplify_angle = 0.0
+path_rotation = 2
+path_rotation_accurate = true
+path_local = true
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
+smooth_faces = true
+material = SubResource("StandardMaterial3D_mn11d")
