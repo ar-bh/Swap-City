@@ -1,7 +1,10 @@
 [gd_scene format=3 uid="uid://uhemq6uhi44u"]
 
 [ext_resource type="PackedScene" uid="uid://vkwma6snsjag" path="res://assets/blob.glb" id="1_oul6g"]
+[ext_resource type="Script" uid="uid://cjs5rcpnq8xfv" path="res://player/player.gd" id="1_yw30f"]
 [ext_resource type="Script" uid="uid://ryvfxgcjgc8l" path="res://player/legs.gd" id="2_rkbax"]
+[ext_resource type="Script" uid="uid://bvaojfc7xwodj" path="res://player/arms.gd" id="3_g1dw6"]
+[ext_resource type="PackedScene" uid="uid://bcs0k7ahaw7gn" path="res://assets/space_gun.glb" id="4_gun"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mn11d"]
 radius = 1.1
@@ -30,12 +33,42 @@ radius = 0.25
 height = 0.5
 
 [sub_resource type="Curve3D" id="Curve3D_g1dw6"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -0.32, -0.39000002, 0, 0, 0, 0, 0, 0, 0, -0.36961082, -0.6266649, 0.08309053, 0, 0, 0, 0, 0, 0, -0.41449764, -0.8472496, 0.15160172, 0, 0, 0, 0, 0, 0, -0.45466042, -1.051754, 0.20553358, 0, 0, 0, 0, 0, 0, -0.49009916, -1.2401782, 0.24488612, 0, 0, 0, 0, 0, 0, -0.52081394, -1.4125223, 0.2696593, 0, 0, 0, 0, 0, 0, -0.5468046, -1.568786, 0.2798532, 0, 0, 0, 0, 0, 0, -0.56807125, -1.7089696, 0.27546772, 0, 0, 0, 0, 0, 0, -0.5846139, -1.833073, 0.25650293, 0, 0, 0, 0, 0, 0, -0.5964325, -1.9410961, 0.2229588, 0, 0, 0, 0, 0, 0, -0.6035271, -2.033039, 0.17483534, 0, 0, 0, 0, 0, 0, -0.60589767, -2.1089017, 0.11213255),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mn11d"]
 
 [sub_resource type="Curve3D" id="Curve3D_yw30f"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0.32, -0.39000002, 0, 0, 0, 0, 0, 0, 0, 0.36961082, -0.6266649, 0.08309053, 0, 0, 0, 0, 0, 0, 0.41449764, -0.8472496, 0.15160172, 0, 0, 0, 0, 0, 0, 0.45466042, -1.051754, 0.20553358, 0, 0, 0, 0, 0, 0, 0.49009916, -1.2401782, 0.24488612, 0, 0, 0, 0, 0, 0, 0.52081394, -1.4125223, 0.2696593, 0, 0, 0, 0, 0, 0, 0.5468046, -1.568786, 0.2798532, 0, 0, 0, 0, 0, 0, 0.56807125, -1.7089696, 0.27546772, 0, 0, 0, 0, 0, 0, 0.5846139, -1.833073, 0.25650293, 0, 0, 0, 0, 0, 0, 0.5964325, -1.9410961, 0.2229588, 0, 0, 0, 0, 0, 0, 0.6035271, -2.033039, 0.17483534, 0, 0, 0, 0, 0, 0, 0.60589767, -2.1089017, 0.11213255),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7glny"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_iemch"]
+material = SubResource("StandardMaterial3D_7glny")
+radius = 0.2
+height = 0.4
+
+[sub_resource type="Curve3D" id="Curve3D_leftarm"]
+
+[sub_resource type="Curve3D" id="Curve3D_qjkh3"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -0.62, 0.26, 0.08, 0, 0, 0, 0, 0, 0, -0.6001513, 0.24015129, 0.166011, 0, 0, 0, 0, 0, 0, -0.5803026, 0.2203026, 0.25202203, 0, 0, 0, 0, 0, 0, -0.5604539, 0.20045389, 0.33803302, 0, 0, 0, 0, 0, 0, -0.5406052, 0.1806052, 0.42404407, 0, 0, 0, 0, 0, 0, -0.5207565, 0.1607565, 0.51005507, 0, 0, 0, 0, 0, 0, -0.496211, 0.13621104, 0.61641866, 0, 0, 0, 0, 0, 0, -0.46696874, 0.10696882, 0.7431349, 0, 0, 0, 0, 0, 0, -0.4377265, 0.07772661, 0.8698511, 0, 0, 0, 0, 0, 0, -0.40848425, 0.0484844, 0.99656737, 0, 0, 0, 0, 0, 0, -0.379242, 0.019242182, 1.1232836, 0, 0, 0, 0, 0, 0, -0.34999976, -0.010000035, 1.2499999),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 12
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_mn11d"]
+radius = 0.3
 
 [node name="Player" type="CharacterBody3D" unique_id=179349838]
+script = ExtResource("1_yw30f")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1635119416]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
@@ -72,7 +105,7 @@ bones/3/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, 0.26, 0.08)
 bones/3/enabled = true
 bones/3/position = Vector3(-0.62, 0.26, 0.08)
 bones/3/rotation = Quaternion(0, 0, 0, 1)
-bones/3/scale = Vector3(1, 1, 1)
+bones/3/scale = Vector3(1.1225687, 1.1225687, 1.1225687)
 bones/4/name = "RightElbow"
 bones/4/parent = 3
 bones/4/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35, -0.26, 0.08)
@@ -110,23 +143,23 @@ bones/8/rotation = Quaternion(0, 0, 0, 1)
 bones/8/scale = Vector3(1, 1, 1)
 bones/9/name = "LeftShoulder"
 bones/9/parent = -1
-bones/9/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 0.26, 0.08)
+bones/9/rest = Transform3D(0.9828963, 0.1841597, 0, -0.1841597, 0.9828963, 0, 0, 0, 1, 0.62477696, 0.29083562, 0)
 bones/9/enabled = true
-bones/9/position = Vector3(0.62, 0.26, 0.08)
-bones/9/rotation = Quaternion(0, 0, 0, 1)
+bones/9/position = Vector3(0.62477696, 0.29083562, 0)
+bones/9/rotation = Quaternion(0, 0, -0.092476115, 0.9957149)
 bones/9/scale = Vector3(1, 1, 1)
 bones/10/name = "LeftElbow"
 bones/10/parent = 9
-bones/10/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, -0.26, 0.08)
+bones/10/rest = Transform3D(0.9372157, -0.34875035, 0, 0.34875035, 0.9372157, 0, 0, 0, 1, 0.34665787, -0.25859135, 0.08)
 bones/10/enabled = true
-bones/10/position = Vector3(0.35, -0.26, 0.08)
-bones/10/rotation = Quaternion(0, 0, 0, 1)
+bones/10/position = Vector3(0.34665787, -0.25859135, 0.08)
+bones/10/rotation = Quaternion(0, 0, 0.17717835, 0.9841788)
 bones/10/scale = Vector3(1, 1, 1)
 bones/11/name = "LeftHand"
 bones/11/parent = 10
-bones/11/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06, -0.65, -0.02)
+bones/11/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.056564018, -0.64517677, -0.02)
 bones/11/enabled = true
-bones/11/position = Vector3(0.06, -0.65, -0.02)
+bones/11/position = Vector3(0.056564018, -0.64517677, -0.02)
 bones/11/rotation = Quaternion(0, 0, 0, 1)
 bones/11/scale = Vector3(1, 1, 1)
 
@@ -174,7 +207,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07, 0.23, 0.05)
 mesh = SubResource("SphereMesh_mn11d")
 
 [node name="LeftShoe" type="BoneAttachment3D" parent="Blob/Skeleton" unique_id=877240386]
-transform = Transform3D(0.993372, 0.045850504, -0.10540254, -0.062633306, 0.98481894, -0.16189116, 0.09637962, 0.16741987, 0.9811634, 0.6600001, -2.45, 0.019999921)
+transform = Transform3D(0.96210206, -0.0016931146, 0.27268445, 0.031684533, 0.9939016, -0.105620205, -0.27084267, 0.1102573, 0.95628846, 0.66, -2.45, 0.019999951)
 bone_name = "LeftFoot"
 bone_idx = 8
 
@@ -183,7 +216,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07, 0.23, 0.05)
 mesh = SubResource("SphereMesh_mn11d")
 
 [node name="TwoBoneIK3D" type="TwoBoneIK3D" parent="Blob/Skeleton" unique_id=418578583]
-setting_count = 2
+setting_count = 4
 settings/0/target_node = NodePath("../RightFootTarget")
 settings/0/pole_node = NodePath("../RightPole")
 settings/0/root_bone_name = "RightHip"
@@ -206,6 +239,28 @@ settings/1/end_bone_name = "LeftFoot"
 settings/1/end_bone = 8
 settings/1/use_virtual_end = false
 settings/1/extend_end_bone = false
+settings/2/target_node = NodePath("../ArmAim/RightHandTarget")
+settings/2/pole_node = NodePath("../ArmAim/RightArmPole")
+settings/2/root_bone_name = "RightShoulder"
+settings/2/root_bone = 3
+settings/2/middle_bone_name = "RightElbow"
+settings/2/middle_bone = 4
+settings/2/pole_direction = 5
+settings/2/end_bone_name = "RightHand"
+settings/2/end_bone = 5
+settings/2/use_virtual_end = false
+settings/2/extend_end_bone = false
+settings/3/target_node = NodePath("../LeftHandTarget")
+settings/3/pole_node = NodePath("../LeftArmPole")
+settings/3/root_bone_name = "LeftShoulder"
+settings/3/root_bone = 9
+settings/3/middle_bone_name = "LeftElbow"
+settings/3/middle_bone = 10
+settings/3/pole_direction = 5
+settings/3/end_bone_name = "LeftHand"
+settings/3/end_bone = 11
+settings/3/use_virtual_end = false
+settings/3/extend_end_bone = false
 
 [node name="Legs" type="Node3D" parent="Blob/Skeleton" unique_id=1455230120]
 script = ExtResource("2_rkbax")
@@ -247,3 +302,100 @@ path_u_distance = 1.0
 path_joined = false
 smooth_faces = true
 material = SubResource("StandardMaterial3D_mn11d")
+
+[node name="ArmAim" type="Node3D" parent="Blob/Skeleton" unique_id=626657764]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29, 0)
+
+[node name="RightHandTarget" type="Marker3D" parent="Blob/Skeleton/ArmAim" unique_id=7518770]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.15, -0.4, 1.0)
+
+[node name="GunMount" type="Marker3D" parent="Blob/Skeleton/ArmAim/RightHandTarget" unique_id=1693621656]
+unique_name_in_owner = true
+
+[node name="SpaceGun" parent="Blob/Skeleton/ArmAim/RightHandTarget/GunMount" unique_id=691267984 instance=ExtResource("4_gun")]
+transform = Transform3D(0, 0, 2.6, 0, 2.6, 0, -2.6, 0, 0, 0, 0.19, 0.09)
+
+[node name="RightArmPole" type="Marker3D" parent="Blob/Skeleton/ArmAim" unique_id=1809904038]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, -1, 0.2)
+
+[node name="RightGlove" type="BoneAttachment3D" parent="Blob/Skeleton" unique_id=559743179]
+transform = Transform3D(-0.7857802, -0.150673, -0.7874056, 0.76213306, 0.20167264, -0.7991507, 0.24872299, -1.0939773, -0.038872868, -0.34999976, -0.010000035, 1.2499999)
+bone_name = "RightHand"
+bone_idx = 5
+
+[node name="Mesh" type="MeshInstance3D" parent="Blob/Skeleton/RightGlove" unique_id=801139837]
+transform = Transform3D(0.89081407, 0, 0, 0, 0.89081407, 0, 0, 0, 0.89081407, 0, 0, 0)
+mesh = SubResource("SphereMesh_iemch")
+
+[node name="LeftHandTarget" type="Marker3D" parent="Blob/Skeleton" unique_id=936628940]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.083, -0.653, 0.06)
+
+[node name="LeftArmPole" type="Marker3D" parent="Blob/Skeleton" unique_id=953282799]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, -0.2, -1.2)
+
+[node name="LeftGlove" type="BoneAttachment3D" parent="Blob/Skeleton" unique_id=979652215]
+transform = Transform3D(-0.7317292, 0.43067122, 0.78472614, -0.73093843, 0.29760253, -0.84490347, -0.51672214, -1.0308518, 0.08392431, 0.049999952, -0.11000028, 1.1499999)
+bone_name = "LeftHand"
+bone_idx = 11
+
+[node name="Mesh" type="MeshInstance3D" parent="Blob/Skeleton/LeftGlove" unique_id=697429735]
+transform = Transform3D(0.86493397, 0, 0, 0, 0.86493397, 0, 0, 0, 0.86493397, 0, 0, 0)
+mesh = SubResource("SphereMesh_iemch")
+
+[node name="Arms" type="Node3D" parent="Blob/Skeleton" unique_id=1376044053]
+script = ExtResource("3_g1dw6")
+
+[node name="RightPath" type="Path3D" parent="Blob/Skeleton/Arms" unique_id=1928215300]
+curve = SubResource("Curve3D_qjkh3")
+
+[node name="RightTube" type="CSGPolygon3D" parent="Blob/Skeleton/Arms" unique_id=1027383391]
+polygon = PackedVector2Array(-0.14, 0, -0.11326238, -0.082289934, -0.04326238, -0.13314791, 0.04326238, -0.13314791, 0.11326238, -0.082289934, 0.14, -1.7145055e-17, 0.11326238, 0.082289934, 0.04326238, 0.13314791, -0.04326238, 0.13314791, -0.11326238, 0.082289934)
+mode = 2
+path_node = NodePath("../RightPath")
+path_interval_type = 0
+path_interval = 0.04
+path_simplify_angle = 0.0
+path_rotation = 2
+path_rotation_accurate = true
+path_local = true
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
+smooth_faces = true
+material = SubResource("StandardMaterial3D_mn11d")
+
+[node name="LeftPath" type="Path3D" parent="Blob/Skeleton/Arms" unique_id=673725362]
+curve = SubResource("Curve3D_leftarm")
+
+[node name="LeftTube" type="CSGPolygon3D" parent="Blob/Skeleton/Arms" unique_id=161593747]
+polygon = PackedVector2Array(-0.14, 0, -0.11326238, -0.082289934, -0.04326238, -0.13314791, 0.04326238, -0.13314791, 0.11326238, -0.082289934, 0.14, -1.7145055e-17, 0.11326238, 0.082289934, 0.04326238, 0.13314791, -0.04326238, 0.13314791, -0.11326238, 0.082289934)
+mode = 2
+path_node = NodePath("../LeftPath")
+path_interval_type = 0
+path_interval = 0.04
+path_simplify_angle = 0.0
+path_rotation = 2
+path_rotation_accurate = false
+path_local = true
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
+smooth_faces = true
+material = SubResource("StandardMaterial3D_mn11d")
+
+[node name="CameraYaw" type="Node3D" parent="." unique_id=434169195]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, 0)
+
+[node name="CameraPitch" type="Node3D" parent="CameraYaw" unique_id=1726870141]
+
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraYaw/CameraPitch" unique_id=701561343]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0, 0, 0)
+shape = SubResource("SphereShape3D_mn11d")
+spring_length = 5.5
+margin = 0.2
+
+[node name="Camera3D" type="Camera3D" parent="CameraYaw/CameraPitch/SpringArm3D" unique_id=2073718743]
+current = true
