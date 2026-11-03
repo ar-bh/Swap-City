@@ -27,7 +27,7 @@ extends CharacterBody3D
 @export_group("Shot")
 @export var shot_range := 80.0
 @export var tracer_time := 0.06
-@export var bullet_color := Color(1.0, 0.945, 0.69, 1.0)
+@export var bullet_color := Color(0.3647, 0.9059, 0.6196, 1.0)
 @export_range(0.005, 0.3, 0.005) var bullet_width := 0.035
 
 var _bob := 0.0

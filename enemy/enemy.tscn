@@ -1,0 +1,469 @@
+[gd_scene format=3 uid="uid://bf65gvjfnlskn"]
+
+[ext_resource type="PackedScene" uid="uid://b4j7uhoxhkasg" path="res://assets/enemyblob.glb" id="1_1wwld"]
+[ext_resource type="Script" uid="uid://yptar24o64sx" path="res://enemy/enemy.gd" id="1_y5vj3"]
+[ext_resource type="Script" uid="uid://dsr74he67wvih" path="res://player/outline.gd" id="3_0iqx3"]
+[ext_resource type="Material" uid="uid://comcoe0e71vmy" path="res://shaders/outline_material.tres" id="4_vqlsk"]
+[ext_resource type="PackedScene" uid="uid://dqd4ppig6xkrj" path="res://assets/pistol.glb" id="5_1wwld"]
+[ext_resource type="Script" uid="uid://ryvfxgcjgc8l" path="res://player/legs.gd" id="5_fhiw4"]
+[ext_resource type="Script" uid="uid://bvaojfc7xwodj" path="res://player/arms.gd" id="7_supfv"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mn11d"]
+radius = 1.1
+height = 3.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oul6g"]
+albedo_color = Color(1, 1, 0, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_mn11d"]
+material = SubResource("StandardMaterial3D_oul6g")
+size = Vector2(0.5, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rkbax"]
+albedo_color = Color(0, 0, 1, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_g1dw6"]
+material = SubResource("StandardMaterial3D_rkbax")
+size = Vector2(0.5, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iemch"]
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_mn11d"]
+material = SubResource("StandardMaterial3D_iemch")
+radius = 0.25
+height = 0.5
+
+[sub_resource type="Curve3D" id="Curve3D_g1dw6"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -0.32, -0.39000002, 0, 0, 0, 0, 0, 0, 0, -0.36961082, -0.6266649, 0.08309053, 0, 0, 0, 0, 0, 0, -0.41449764, -0.8472496, 0.15160172, 0, 0, 0, 0, 0, 0, -0.45466042, -1.051754, 0.20553358, 0, 0, 0, 0, 0, 0, -0.49009916, -1.2401782, 0.24488612, 0, 0, 0, 0, 0, 0, -0.52081394, -1.4125223, 0.2696593, 0, 0, 0, 0, 0, 0, -0.5468046, -1.568786, 0.2798532, 0, 0, 0, 0, 0, 0, -0.56807125, -1.7089696, 0.27546772, 0, 0, 0, 0, 0, 0, -0.5846139, -1.833073, 0.25650293, 0, 0, 0, 0, 0, 0, -0.5964325, -1.9410961, 0.2229588, 0, 0, 0, 0, 0, 0, -0.6035271, -2.033039, 0.17483534, 0, 0, 0, 0, 0, 0, -0.60589767, -2.1089017, 0.11213255),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mn11d"]
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="Curve3D" id="Curve3D_yw30f"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0.32, -0.39000002, 0, 0, 0, 0, 0, 0, 0, 0.36961082, -0.6266649, 0.08309053, 0, 0, 0, 0, 0, 0, 0.41449764, -0.8472496, 0.15160172, 0, 0, 0, 0, 0, 0, 0.45466042, -1.051754, 0.20553358, 0, 0, 0, 0, 0, 0, 0.49009916, -1.2401782, 0.24488612, 0, 0, 0, 0, 0, 0, 0.52081394, -1.4125223, 0.2696593, 0, 0, 0, 0, 0, 0, 0.5468046, -1.568786, 0.2798532, 0, 0, 0, 0, 0, 0, 0.56807125, -1.7089696, 0.27546772, 0, 0, 0, 0, 0, 0, 0.5846139, -1.833073, 0.25650293, 0, 0, 0, 0, 0, 0, 0.5964325, -1.9410961, 0.2229588, 0, 0, 0, 0, 0, 0, 0.6035271, -2.033039, 0.17483534, 0, 0, 0, 0, 0, 0, 0.60589767, -2.1089017, 0.11213255),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 12
+
+[sub_resource type="Gradient" id="Gradient_muzzle"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_muzzle"]
+gradient = SubResource("Gradient_muzzle")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_mn11d"]
+emission_shape = 1
+emission_sphere_radius = 0.04
+direction = Vector3(0, 0, 1)
+spread = 28.0
+initial_velocity_min = 2.5
+initial_velocity_max = 5.0
+gravity = Vector3(0, 0, 0)
+damping_min = 6.0000005
+damping_max = 8.0
+scale_min = 0.4
+color_ramp = SubResource("GradientTexture1D_muzzle")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spark"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_iemch"]
+material = SubResource("StandardMaterial3D_spark")
+size = Vector2(0.12, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7glny"]
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_iemch"]
+material = SubResource("StandardMaterial3D_7glny")
+radius = 0.2
+height = 0.4
+
+[sub_resource type="Curve3D" id="Curve3D_qjkh3"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -0.62, 0.26, 0.08, 0, 0, 0, 0, 0, 0, -0.6568446, 0.19720158, 0.044930402, 0, 0, 0, 0, 0, 0, -0.6936893, 0.13440315, 0.009860806, 0, 0, 0, 0, 0, 0, -0.7305339, 0.07160473, -0.025208794, 0, 0, 0, 0, 0, 0, -0.76737857, 0.008806318, -0.060278386, 0, 0, 0, 0, 0, 0, -0.8042232, -0.053992122, -0.095347986, 0, 0, 0, 0, 0, 0, -0.852405, -0.087628484, -0.011711627, 0, 0, 0, 0, 0, 0, -0.911924, -0.09210283, 0.19063067, 0, 0, 0, 0, 0, 0, -0.971443, -0.09657718, 0.392973, 0, 0, 0, 0, 0, 0, -1.030962, -0.101051524, 0.5953153, 0, 0, 0, 0, 0, 0, -1.090481, -0.10552587, 0.7976576, 0, 0, 0, 0, 0, 0, -1.15, -0.11000022, 0.99999994),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 12
+
+[sub_resource type="Curve3D" id="Curve3D_leftarm"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0.62477696, 0.29083562, 0, 0, 0, 0, 0, 0, 0, 0.6607531, 0.22243072, -0.020524144, 0, 0, 0, 0, 0, 0, 0.6967292, 0.15402582, -0.04104829, 0, 0, 0, 0, 0, 0, 0.73270524, 0.085620925, -0.06157243, 0, 0, 0, 0, 0, 0, 0.76868135, 0.017216027, -0.08209658, 0, 0, 0, 0, 0, 0, 0.80465746, -0.051188886, -0.10262072, 0, 0, 0, 0, 0, 0, 0.8463141, -0.13699211, -0.09716616, 0, 0, 0, 0, 0, 0, 0.89365125, -0.2401937, -0.06573291, 0, 0, 0, 0, 0, 0, 0.9409884, -0.3433953, -0.034299664, 0, 0, 0, 0, 0, 0, 0.9883256, -0.44659686, -0.0028664172, 0, 0, 0, 0, 0, 0, 1.0356628, -0.5497984, 0.02856683, 0, 0, 0, 0, 0, 0, 1.083, -0.653, 0.060000084),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kyvib"]
+resource_local_to_scene = true
+shading_mode = 0
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_7glny"]
+material = SubResource("StandardMaterial3D_kyvib")
+
+[node name="Enemy" type="CharacterBody3D" unique_id=179349838]
+script = ExtResource("1_y5vj3")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1635119416]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
+shape = SubResource("CapsuleShape3D_mn11d")
+
+[node name="Blob" parent="." unique_id=1261243360 instance=ExtResource("1_1wwld")]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.45, 0)
+script = ExtResource("3_0iqx3")
+outline_material = ExtResource("4_vqlsk")
+
+[node name="Skeleton" type="Skeleton3D" parent="Blob" unique_id=1317010121]
+bones/0/name = "RightHip"
+bones/0/parent = -1
+bones/0/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.32, -0.79, 0)
+bones/0/enabled = true
+bones/0/position = Vector3(-0.32, -0.79, 0)
+bones/0/rotation = Quaternion(0, 0, 0, 1)
+bones/0/scale = Vector3(1, 1, 1)
+bones/1/name = "RightKnee"
+bones/1/parent = 0
+bones/1/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.37, -0.68, 0.13)
+bones/1/enabled = true
+bones/1/position = Vector3(-0.37, -0.68, 0.13)
+bones/1/rotation = Quaternion(0, 0, 0, 1)
+bones/1/scale = Vector3(1, 1, 1)
+bones/2/name = "RightFoot"
+bones/2/parent = 1
+bones/2/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.16, -0.98, -0.11)
+bones/2/enabled = true
+bones/2/position = Vector3(-0.16, -0.98, -0.11)
+bones/2/rotation = Quaternion(0, 0, 0, 1)
+bones/2/scale = Vector3(1, 1, 1)
+bones/3/name = "RightShoulder"
+bones/3/parent = -1
+bones/3/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, 0.26, 0.08)
+bones/3/enabled = true
+bones/3/position = Vector3(-0.62, 0.26, 0.08)
+bones/3/rotation = Quaternion(0, 0, 0, 1)
+bones/3/scale = Vector3(1.0255517, 1.0255517, 1.0255517)
+bones/4/name = "RightElbow"
+bones/4/parent = 3
+bones/4/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35, -0.26, 0.08)
+bones/4/enabled = true
+bones/4/position = Vector3(-0.35, -0.26, 0.08)
+bones/4/rotation = Quaternion(0, 0, 0, 1)
+bones/4/scale = Vector3(1, 1, 1)
+bones/5/name = "RightHand"
+bones/5/parent = 4
+bones/5/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, -0.65, -0.02)
+bones/5/enabled = true
+bones/5/position = Vector3(-0.06, -0.65, -0.02)
+bones/5/rotation = Quaternion(0, 0, 0, 1)
+bones/5/scale = Vector3(1, 1, 1)
+bones/6/name = "LeftHip"
+bones/6/parent = -1
+bones/6/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, -0.79, 0)
+bones/6/enabled = true
+bones/6/position = Vector3(0.32, -0.79, 0)
+bones/6/rotation = Quaternion(0, 0, 0, 1)
+bones/6/scale = Vector3(1, 1, 1)
+bones/7/name = "LeftKnee"
+bones/7/parent = 6
+bones/7/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.37, -0.68, 0.13)
+bones/7/enabled = true
+bones/7/position = Vector3(0.37, -0.68, 0.13)
+bones/7/rotation = Quaternion(0, 0, 0, 1)
+bones/7/scale = Vector3(1, 1, 1)
+bones/8/name = "LeftFoot"
+bones/8/parent = 7
+bones/8/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16, -0.98, -0.11)
+bones/8/enabled = true
+bones/8/position = Vector3(0.16, -0.98, -0.11)
+bones/8/rotation = Quaternion(0, 0, 0, 1)
+bones/8/scale = Vector3(1, 1, 1)
+bones/9/name = "LeftShoulder"
+bones/9/parent = -1
+bones/9/rest = Transform3D(0.9828963, 0.1841597, 0, -0.1841597, 0.9828963, 0, 0, 0, 1, 0.62477696, 0.29083562, 0)
+bones/9/enabled = true
+bones/9/position = Vector3(0.62477696, 0.29083562, 0)
+bones/9/rotation = Quaternion(0, 0, -0.092476115, 0.9957149)
+bones/9/scale = Vector3(1, 1, 1)
+bones/10/name = "LeftElbow"
+bones/10/parent = 9
+bones/10/rest = Transform3D(0.9372157, -0.34875035, 0, 0.34875035, 0.9372157, 0, 0, 0, 1, 0.34665787, -0.25859135, 0.08)
+bones/10/enabled = true
+bones/10/position = Vector3(0.34665787, -0.25859135, 0.08)
+bones/10/rotation = Quaternion(0, 0, 0.17717835, 0.9841788)
+bones/10/scale = Vector3(1, 1, 1)
+bones/11/name = "LeftHand"
+bones/11/parent = 10
+bones/11/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.056564018, -0.64517677, -0.02)
+bones/11/enabled = true
+bones/11/position = Vector3(0.056564018, -0.64517677, -0.02)
+bones/11/rotation = Quaternion(0, 0, 0, 1)
+bones/11/scale = Vector3(1, 1, 1)
+
+[node name="RightFootTarget" type="Marker3D" parent="Blob/Skeleton" unique_id=1981583864]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.66, -2.45, 0.02)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/RightFootTarget" unique_id=1150340622]
+visible = false
+mesh = SubResource("PlaneMesh_mn11d")
+
+[node name="LeftFootTarget" type="Marker3D" parent="Blob/Skeleton" unique_id=2138899389]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.66, -2.45, 0.02)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/LeftFootTarget" unique_id=1633465343]
+visible = false
+mesh = SubResource("PlaneMesh_mn11d")
+
+[node name="RightConstant" type="Marker3D" parent="Blob/Skeleton" unique_id=94045216]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.66, -2.45, 0.02)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/RightConstant" unique_id=93688021]
+visible = false
+mesh = SubResource("PlaneMesh_g1dw6")
+
+[node name="LeftConstant" type="Marker3D" parent="Blob/Skeleton" unique_id=1753506543]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.66, -2.45, 0.02)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Blob/Skeleton/LeftConstant" unique_id=1346860386]
+visible = false
+mesh = SubResource("PlaneMesh_g1dw6")
+
+[node name="RightPole" type="Marker3D" parent="Blob/Skeleton" unique_id=153144307]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.72, -1.47, 1)
+
+[node name="LeftPole" type="Marker3D" parent="Blob/Skeleton" unique_id=634620596]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.72, -1.47, 1)
+
+[node name="RightShoe" type="BoneAttachment3D" parent="Blob/Skeleton" unique_id=1995148426]
+transform = Transform3D(0.96210206, 0.0016931146, -0.27268445, -0.031684533, 0.9939016, -0.105620205, 0.27084267, 0.1102573, 0.95628846, -0.66, -2.45, 0.019999951)
+bone_name = "RightFoot"
+bone_idx = 2
+
+[node name="Mesh" type="MeshInstance3D" parent="Blob/Skeleton/RightShoe" unique_id=2139682608]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07, 0.23, 0.05)
+material_overlay = ExtResource("4_vqlsk")
+mesh = SubResource("SphereMesh_mn11d")
+
+[node name="LeftShoe" type="BoneAttachment3D" parent="Blob/Skeleton" unique_id=877240386]
+transform = Transform3D(0.96210206, -0.0016931146, 0.27268445, 0.031684533, 0.9939016, -0.105620205, -0.27084267, 0.1102573, 0.95628846, 0.66, -2.45, 0.019999951)
+bone_name = "LeftFoot"
+bone_idx = 8
+
+[node name="Mesh" type="MeshInstance3D" parent="Blob/Skeleton/LeftShoe" unique_id=1408272822]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07, 0.23, 0.05)
+material_overlay = ExtResource("4_vqlsk")
+mesh = SubResource("SphereMesh_mn11d")
+
+[node name="TwoBoneIK3D" type="TwoBoneIK3D" parent="Blob/Skeleton" unique_id=418578583]
+setting_count = 4
+settings/0/target_node = NodePath("../RightFootTarget")
+settings/0/pole_node = NodePath("../RightPole")
+settings/0/root_bone_name = "RightHip"
+settings/0/root_bone = 0
+settings/0/middle_bone_name = "RightKnee"
+settings/0/middle_bone = 1
+settings/0/pole_direction = 5
+settings/0/end_bone_name = "RightFoot"
+settings/0/end_bone = 2
+settings/0/use_virtual_end = false
+settings/0/extend_end_bone = false
+settings/1/target_node = NodePath("../LeftFootTarget")
+settings/1/pole_node = NodePath("../LeftPole")
+settings/1/root_bone_name = "LeftHip"
+settings/1/root_bone = 6
+settings/1/middle_bone_name = "LeftKnee"
+settings/1/middle_bone = 7
+settings/1/pole_direction = 5
+settings/1/end_bone_name = "LeftFoot"
+settings/1/end_bone = 8
+settings/1/use_virtual_end = false
+settings/1/extend_end_bone = false
+settings/2/target_node = NodePath("../ArmAim/RightHandTarget")
+settings/2/pole_node = NodePath("../ArmAim/RightArmPole")
+settings/2/root_bone_name = "RightShoulder"
+settings/2/root_bone = 3
+settings/2/middle_bone_name = "RightElbow"
+settings/2/middle_bone = 4
+settings/2/pole_direction = 5
+settings/2/end_bone_name = "RightHand"
+settings/2/end_bone = 5
+settings/2/use_virtual_end = false
+settings/2/extend_end_bone = false
+settings/3/target_node = NodePath("../LeftHandTarget")
+settings/3/pole_node = NodePath("../LeftArmPole")
+settings/3/root_bone_name = "LeftShoulder"
+settings/3/root_bone = 9
+settings/3/middle_bone_name = "LeftElbow"
+settings/3/middle_bone = 10
+settings/3/pole_direction = 5
+settings/3/end_bone_name = "LeftHand"
+settings/3/end_bone = 11
+settings/3/use_virtual_end = false
+settings/3/extend_end_bone = false
+
+[node name="Legs" type="Node3D" parent="Blob/Skeleton" unique_id=1455230120]
+script = ExtResource("5_fhiw4")
+
+[node name="RightPath" type="Path3D" parent="Blob/Skeleton/Legs" unique_id=2025011973]
+curve = SubResource("Curve3D_g1dw6")
+
+[node name="RightTube" type="CSGPolygon3D" parent="Blob/Skeleton/Legs" unique_id=1023651717]
+material_overlay = ExtResource("4_vqlsk")
+polygon = PackedVector2Array(-0.14, 0, -0.11326238, -0.082289934, -0.04326238, -0.13314791, 0.04326238, -0.13314791, 0.11326238, -0.082289934, 0.14, -1.7145055e-17, 0.11326238, 0.082289934, 0.04326238, 0.13314791, -0.04326238, 0.13314791, -0.11326238, 0.082289934)
+mode = 2
+path_node = NodePath("../RightPath")
+path_interval_type = 0
+path_interval = 0.04
+path_simplify_angle = 0.0
+path_rotation = 2
+path_rotation_accurate = true
+path_local = true
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
+smooth_faces = true
+material = SubResource("StandardMaterial3D_mn11d")
+
+[node name="LeftPath" type="Path3D" parent="Blob/Skeleton/Legs" unique_id=697892305]
+curve = SubResource("Curve3D_yw30f")
+
+[node name="LeftTube" type="CSGPolygon3D" parent="Blob/Skeleton/Legs" unique_id=90628511]
+material_overlay = ExtResource("4_vqlsk")
+polygon = PackedVector2Array(-0.14, 0, -0.11326238, -0.082289934, -0.04326238, -0.13314791, 0.04326238, -0.13314791, 0.11326238, -0.082289934, 0.14, -1.7145055e-17, 0.11326238, 0.082289934, 0.04326238, 0.13314791, -0.04326238, 0.13314791, -0.11326238, 0.082289934)
+mode = 2
+path_node = NodePath("../LeftPath")
+path_interval_type = 0
+path_interval = 0.04
+path_simplify_angle = 0.0
+path_rotation = 2
+path_rotation_accurate = true
+path_local = true
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
+smooth_faces = true
+material = SubResource("StandardMaterial3D_mn11d")
+
+[node name="ArmAim" type="Node3D" parent="Blob/Skeleton" unique_id=626657764]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29, 0)
+
+[node name="RightHandTarget" type="Marker3D" parent="Blob/Skeleton/ArmAim" unique_id=7518770]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.15, -0.4, 1)
+
+[node name="GunMount" type="Marker3D" parent="Blob/Skeleton/ArmAim/RightHandTarget" unique_id=1693621656]
+unique_name_in_owner = true
+
+[node name="Pistol" parent="Blob/Skeleton/ArmAim/RightHandTarget/GunMount" unique_id=1274567308 instance=ExtResource("5_1wwld")]
+unique_name_in_owner = true
+transform = Transform3D(0.035, 0, 0, 0, 0.035, 0, 0, 0, 0.035, 0, 0.06617713, 0.0601393)
+
+[node name="Muzzle" type="Marker3D" parent="Blob/Skeleton/ArmAim/RightHandTarget/GunMount" unique_id=83482237]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32004213, 0.7155969)
+
+[node name="MuzzleFlash" type="GPUParticles3D" parent="Blob/Skeleton/ArmAim/RightHandTarget/GunMount/Muzzle" unique_id=1819767480]
+unique_name_in_owner = true
+emitting = false
+amount = 10
+lifetime = 0.12
+one_shot = true
+explosiveness = 1.0
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_mn11d")
+draw_pass_1 = SubResource("QuadMesh_iemch")
+
+[node name="RightArmPole" type="Marker3D" parent="Blob/Skeleton/ArmAim" unique_id=1809904038]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, -1, 0.2)
+
+[node name="RightGlove" type="BoneAttachment3D" parent="Blob/Skeleton" unique_id=559743179]
+transform = Transform3D(-0.7104871, 0.5659369, -0.47610903, 0.6982943, 0.29586077, -0.69036794, -0.24361786, -0.8024576, -0.5903123, -1.15, -0.11000022, 1)
+bone_name = "RightHand"
+bone_idx = 5
+
+[node name="Mesh" type="MeshInstance3D" parent="Blob/Skeleton/RightGlove" unique_id=801139837]
+transform = Transform3D(0.97508496, 0, 0, 0, 0.97508496, 0, 0, 0, 0.97508496, 0, 0, 0)
+material_overlay = ExtResource("4_vqlsk")
+mesh = SubResource("SphereMesh_iemch")
+
+[node name="LeftHandTarget" type="Marker3D" parent="Blob/Skeleton" unique_id=936628940]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.083, -0.653, 0.06)
+
+[node name="LeftArmPole" type="Marker3D" parent="Blob/Skeleton" unique_id=953282799]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, -0.2, -1.2)
+
+[node name="LeftGlove" type="BoneAttachment3D" parent="Blob/Skeleton" unique_id=979652215]
+transform = Transform3D(-0.85361177, -0.4843227, 0.19177727, -0.5150084, 0.8399259, -0.17114617, -0.07818875, -0.2448593, -0.96640086, 1.083, -0.653, 0.060000084)
+bone_name = "LeftHand"
+bone_idx = 11
+
+[node name="Mesh" type="MeshInstance3D" parent="Blob/Skeleton/LeftGlove" unique_id=697429735]
+material_overlay = ExtResource("4_vqlsk")
+mesh = SubResource("SphereMesh_iemch")
+
+[node name="Arms" type="Node3D" parent="Blob/Skeleton" unique_id=1376044053]
+script = ExtResource("7_supfv")
+
+[node name="RightPath" type="Path3D" parent="Blob/Skeleton/Arms" unique_id=1928215300]
+curve = SubResource("Curve3D_qjkh3")
+
+[node name="RightTube" type="CSGPolygon3D" parent="Blob/Skeleton/Arms" unique_id=1027383391]
+material_overlay = ExtResource("4_vqlsk")
+polygon = PackedVector2Array(-0.14, 0, -0.11326238, -0.082289934, -0.04326238, -0.13314791, 0.04326238, -0.13314791, 0.11326238, -0.082289934, 0.14, -1.7145055e-17, 0.11326238, 0.082289934, 0.04326238, 0.13314791, -0.04326238, 0.13314791, -0.11326238, 0.082289934)
+mode = 2
+path_node = NodePath("../RightPath")
+path_interval_type = 0
+path_interval = 0.04
+path_simplify_angle = 0.0
+path_rotation = 2
+path_rotation_accurate = true
+path_local = true
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
+smooth_faces = true
+material = SubResource("StandardMaterial3D_mn11d")
+
+[node name="LeftPath" type="Path3D" parent="Blob/Skeleton/Arms" unique_id=673725362]
+curve = SubResource("Curve3D_leftarm")
+
+[node name="LeftTube" type="CSGPolygon3D" parent="Blob/Skeleton/Arms" unique_id=161593747]
+material_overlay = ExtResource("4_vqlsk")
+polygon = PackedVector2Array(-0.14, 0, -0.11326238, -0.082289934, -0.04326238, -0.13314791, 0.04326238, -0.13314791, 0.11326238, -0.082289934, 0.14, -1.7145055e-17, 0.11326238, 0.082289934, 0.04326238, 0.13314791, -0.04326238, 0.13314791, -0.11326238, 0.082289934)
+mode = 2
+path_node = NodePath("../LeftPath")
+path_interval_type = 0
+path_interval = 0.04
+path_simplify_angle = 0.0
+path_rotation = 2
+path_rotation_accurate = false
+path_local = true
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
+smooth_faces = true
+material = SubResource("StandardMaterial3D_mn11d")
+
+[node name="Bullet" type="MeshInstance3D" parent="." unique_id=2032371748]
+unique_name_in_owner = true
+top_level = true
+visible = false
+mesh = SubResource("SphereMesh_7glny")
