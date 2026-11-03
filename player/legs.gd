@@ -108,6 +108,20 @@ func _process(delta: float) -> void:
 		_left_tween = _begin_step(left_foot_target, left_constant, "LeftHip")
 		_step_left = false
 
+## Puts both feet straight under the body, e.g. after the body was moved by a swap.
+func snap_feet() -> void:
+	if _left_tween != null:
+		_left_tween.kill()
+	if _right_tween != null:
+		_right_tween.kill()
+	_place_constants(0.0)
+	left_foot_target.global_position = left_constant.global_position
+	right_foot_target.global_position = right_constant.global_position
+	_left_constant_pos = left_constant.global_position
+	_right_constant_pos = right_constant.global_position
+	_left_foot_vel = Vector3.ZERO
+	_right_foot_vel = Vector3.ZERO
+
 func _on_skeleton_updated() -> void:
 	_apply_thickness()
 	_set_curve(left_path, "LeftHip", "LeftKnee", left_shoe)

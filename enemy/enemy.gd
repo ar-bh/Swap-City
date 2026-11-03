@@ -16,6 +16,17 @@ extends CharacterBody3D
 @export var bullet_color := Color(0.0, 0.0, 0.0, 1.0)
 @export var gravity := 9.8 * 3.0
 
+@export_group("Swap")
+## Frozen beat before the bodies start moving.
+@export var swap_freeze := 0.2
+## How long the two bodies take to trade places while the game is paused.
+@export var swap_time := 0.5
+## Frozen beat after they arrive, before the game resumes.
+@export var swap_hold := 0.15
+@export var swap_lift := 0.6
+@export var swap_side := 1.2
+@export var swap_fov_kick := 8.0
+
 enum Phase { TRACK, LOCK, FIRE }
 
 var _phase: Phase = Phase.TRACK
@@ -25,6 +36,8 @@ var _range_left := 0.0
 var _player: Node3D
 var _aim: MeshInstance3D
 var _aim_mat: StandardMaterial3D
+## True while the game is paused for this enemy's swap.
+var swapping := false
 
 @onready var _blob: Node3D = %Blob
 @onready var _arm_aim: Node3D = %ArmAim
@@ -147,35 +160,92 @@ func _aim_at(target: Vector3, delta: float) -> void:
 	_arm_aim.rotation.x = lerp_angle(_arm_aim.rotation.x, -pitch, 1.0 - exp(-turn_follow * delta))
 
 func swap_with(visitor: Node3D) -> void:
-	_swap_facing(visitor)
-	var spot := global_position
-	global_position = visitor.global_position
-	visitor.global_position = spot
+	if swapping:
+		return
+	swapping = true
 	velocity = Vector3.ZERO
 	_bullet.visible = false
 	_aim.visible = false
 	_time = 0.0
 	_phase = Phase.TRACK
 
-func _swap_facing(visitor: Node3D) -> void:
-	var yaw_node: Node3D = visitor.get_node_or_null("CameraYaw") as Node3D
-	var pitch_node: Node3D = visitor.get_node_or_null("CameraYaw/CameraPitch") as Node3D
-	if yaw_node == null or pitch_node == null:
-		return
-	var enemy_face := _blob.rotation.y
-	var enemy_pitch := _arm_aim.rotation.x
-	var visitor_face := yaw_node.rotation.y + PI
-	var visitor_pitch := -pitch_node.rotation.x
-	yaw_node.rotation.y = enemy_face - PI
-	pitch_node.rotation.x = -enemy_pitch
-	var visitor_blob: Node3D = visitor.get_node_or_null("Blob") as Node3D
-	if visitor_blob != null:
-		visitor_blob.rotation.y = enemy_face
-	var visitor_arm: Node3D = visitor.get_node_or_null("Blob/Skeleton/ArmAim") as Node3D
-	if visitor_arm != null:
-		visitor_arm.rotation.x = enemy_pitch
-	_blob.rotation.y = visitor_face
-	_arm_aim.rotation.x = visitor_pitch
+	var yaw_node := visitor.get_node_or_null("CameraYaw") as Node3D
+	var pitch_node := visitor.get_node_or_null("CameraYaw/CameraPitch") as Node3D
+	var visitor_blob := visitor.get_node_or_null("Blob") as Node3D
+	var visitor_arm := visitor.get_node_or_null("%ArmAim") as Node3D
+	var camera := visitor.get_node_or_null("%Camera3D") as Camera3D
+
+	var my_start := global_position
+	var visitor_start := visitor.global_position
+	var my_face := _blob.rotation.y
+	var my_pitch := _arm_aim.rotation.x
+	var visitor_face := my_face
+	var visitor_pitch := my_pitch
+	var yaw_start := 0.0
+	var pitch_start := 0.0
+	if yaw_node != null and pitch_node != null:
+		yaw_start = yaw_node.rotation.y
+		pitch_start = pitch_node.rotation.x
+		visitor_face = yaw_start + PI
+		visitor_pitch = -pitch_start
+	var base_fov := 75.0
+	if camera != null:
+		base_fov = camera.fov
+
+	# Both bodies swing out to opposite sides so they pass around each other instead of through.
+	var side := (visitor_start - my_start).cross(Vector3.UP)
+	if side.length_squared() > 0.0001:
+		side = side.normalized() * swap_side
+
+	# Physics only catches up with the new positions after the game resumes, so the
+	# two bodies ignore each other until then instead of shoving the player aside.
+	var other := visitor as PhysicsBody3D
+	if other != null:
+		add_collision_exception_with(other)
+		other.add_collision_exception_with(self)
+
+	# Freeze the whole game; only this tween keeps running while it is paused.
+	get_tree().paused = true
+	var tween := get_tree().create_tween()
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tween.tween_interval(swap_freeze)
+	tween.tween_method(func(t: float) -> void:
+		var bump := sin(t * PI)
+		var lift := Vector3.UP * swap_lift * bump
+		global_position = my_start.lerp(visitor_start, t) + lift + side * bump
+		visitor.global_position = visitor_start.lerp(my_start, t) + lift - side * bump
+		# The visitor ends up looking the way this enemy looked, and vice versa.
+		_blob.rotation.y = lerp_angle(my_face, visitor_face, t)
+		_arm_aim.rotation.x = lerp_angle(my_pitch, visitor_pitch, t)
+		if yaw_node != null and pitch_node != null:
+			yaw_node.rotation.y = lerp_angle(yaw_start, my_face - PI, t)
+			pitch_node.rotation.x = lerp_angle(pitch_start, -my_pitch, t)
+		if visitor_blob != null:
+			visitor_blob.rotation.y = lerp_angle(visitor_face, my_face, t)
+		if visitor_arm != null:
+			visitor_arm.rotation.x = lerp_angle(visitor_pitch, my_pitch, t)
+		if camera != null:
+			camera.fov = base_fov + swap_fov_kick * bump
+	, 0.0, 1.0, swap_time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_interval(swap_hold)
+	tween.tween_callback(func() -> void:
+		global_position = visitor_start
+		visitor.global_position = my_start
+		if camera != null:
+			camera.fov = base_fov
+		_snap_feet(self)
+		_snap_feet(visitor)
+		swapping = false
+		get_tree().paused = false
+		if other != null:
+			get_tree().create_timer(0.2, false, true).timeout.connect(func() -> void:
+				remove_collision_exception_with(other)
+				other.remove_collision_exception_with(self)))
+
+func _snap_feet(body: Node) -> void:
+	var legs := body.get_node_or_null("Blob/Skeleton/Legs")
+	if legs != null and legs.has_method("snap_feet"):
+		legs.call("snap_feet")
 
 func _paint_aim(color: Color) -> void:
 	_aim_mat.albedo_color = color
