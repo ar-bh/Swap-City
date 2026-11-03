@@ -14,9 +14,8 @@ extends Node3D
 @export_group("Air Pose")
 @export var foot_spring := 80.0
 @export var foot_damping := 6.0
-@export var air_kick := 6.0
-@export var air_tuck := 1.2
-@export var air_trail := 0.8
+@export var air_kick := 1.5
+@export var air_tuck := 0.35
 @export var land_time := 0.06
 
 var _body: CharacterBody3D
@@ -24,7 +23,6 @@ var _left_tween: Tween
 var _right_tween: Tween
 var _step_left := true
 var _airborne := false
-var _left_leads := true
 var _left_foot_vel := Vector3.ZERO
 var _right_foot_vel := Vector3.ZERO
 var _thickness_applied := 999.0
@@ -82,8 +80,8 @@ func _process(delta: float) -> void:
 			_begin_flop()
 		left_foot_target.global_position += left_shift
 		right_foot_target.global_position += right_shift
-		_left_foot_vel = _flop_foot(left_foot_target, _air_goal(left_constant, _left_leads), _left_foot_vel, delta)
-		_right_foot_vel = _flop_foot(right_foot_target, _air_goal(right_constant, not _left_leads), _right_foot_vel, delta)
+		_left_foot_vel = _flop_foot(left_foot_target, _air_goal(left_constant), _left_foot_vel, delta)
+		_right_foot_vel = _flop_foot(right_foot_target, _air_goal(right_constant), _right_foot_vel, delta)
 		_airborne = true
 		return
 	if _airborne:
@@ -216,29 +214,13 @@ func _begin_flop() -> void:
 		_left_tween.kill()
 	if _right_tween != null:
 		_right_tween.kill()
-	var ahead := (left_foot_target.global_position - right_foot_target.global_position).dot(_air_dir())
-	if absf(ahead) < 0.05:
-		_left_leads = _step_left
-	else:
-		_left_leads = ahead > 0.0
-	_left_foot_vel = Vector3.DOWN * air_kick
-	_right_foot_vel = Vector3.DOWN * air_kick
+	_left_foot_vel = Vector3.UP * air_kick
+	_right_foot_vel = Vector3.UP * air_kick
 
-func _air_dir() -> Vector3:
-	var dir := Vector3(_body.velocity.x, 0.0, _body.velocity.z)
-	if dir.length_squared() < 0.04:
-		dir = skeleton.global_basis.z
-		dir.y = 0.0
-	return dir.normalized()
-
-func _air_goal(constant: Marker3D, lead: bool) -> Vector3:
+func _air_goal(constant: Marker3D) -> Vector3:
 	var rise := clampf((_body.velocity.y + 5.0) / 15.0, 0.0, 1.0)
-	var up := lerpf(0.0, 0.1, rise)
-	var fwd := lerpf(-0.15, -air_trail, rise)
-	if lead:
-		up = lerpf(0.1, air_tuck, rise)
-		fwd = lerpf(0.2, 0.7, rise)
-	return constant.global_position + Vector3.UP * up + _air_dir() * fwd
+	var up := lerpf(0.05, air_tuck, rise)
+	return constant.global_position + Vector3.UP * up
 
 func _flop_foot(target: Marker3D, goal: Vector3, vel: Vector3, delta: float) -> Vector3:
 	vel += (goal - target.global_position) * foot_spring * delta

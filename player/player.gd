@@ -15,12 +15,6 @@ extends CharacterBody3D
 @export var bob_rate := 10.0
 
 @export_group("Jump Feel")
-@export var jump_stretch := 0.1
-@export var land_squash := 0.12
-@export var air_stretch := 0.004
-@export var squash_limit := 0.12
-@export var squash_spring := 220.0
-@export var squash_damping := 14.0
 @export var land_dip := 0.45
 @export var dip_spring := 160.0
 @export var dip_damping := 14.0
@@ -42,11 +36,8 @@ var _model_rest_y := 0.0
 var _coyote := 0.0
 var _buffer := 0.0
 var _was_on_floor := true
-var _squash := 0.0
-var _squash_vel := 0.0
 var _dip := 0.0
 var _dip_vel := 0.0
-var _mesh_rest := {}
 
 @onready var _model: Node3D = $Blob
 @onready var _arm_aim: Node3D = %ArmAim
@@ -63,9 +54,6 @@ var _mesh_rest := {}
 func _ready() -> void:
 	_model_rest_y = _model.position.y
 	_model.rotation.y = _face_yaw()
-	for child in _model.get_children():
-		if child is MeshInstance3D:
-			_mesh_rest[child] = child.transform
 	_spring_arm.add_excluded_object(get_rid())
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
@@ -97,8 +85,6 @@ func _physics_process(delta: float) -> void:
 		velocity.y = jump
 		_buffer = 0.0
 		_coyote = 0.0
-		_squash = jump_stretch
-		_squash_vel = 0.0
 	elif not is_on_floor():
 		var g := gravity
 		if velocity.y < 0.0:
@@ -118,31 +104,16 @@ func _physics_process(delta: float) -> void:
 	
 	if is_on_floor() and not _was_on_floor:
 		var impact := clampf(fall_speed / 20.0, 0.35, 1.0)
-		_squash = -land_squash * impact
-		_squash_vel = 0.0
 		_dip = -land_dip * impact
 		_dip_vel = 0.0
 	_was_on_floor = is_on_floor()
 	
 	_model.rotation.y = lerp_angle(_model.rotation.y, _face_yaw(), 1.0 - exp(-turn_follow * delta))
 	_arm_aim.rotation.x = -_camera_pitch.rotation.x
-	_squash_body(delta)
 	_bob_body(delta, flat)
 
 func _face_yaw() -> float:
 	return _camera_yaw.rotation.y + PI
-
-func _squash_body(delta: float) -> void:
-	var target := 0.0
-	if not is_on_floor():
-		target = clampf(velocity.y * air_stretch, -squash_limit, squash_limit)
-	_squash_vel += (squash_spring * (target - _squash) - squash_damping * _squash_vel) * delta
-	_squash += _squash_vel * delta
-	var sy := clampf(1.0 + _squash, 1.0 - squash_limit, 1.0 + squash_limit)
-	var sx := 1.0 / sqrt(sy)
-	var squash := Transform3D(Basis.from_scale(Vector3(sx, sy, sx)), Vector3(0.0, sy - 1.0, 0.0))
-	for mesh in _mesh_rest:
-		mesh.transform = squash * _mesh_rest[mesh]
 
 func _bob_body(delta: float, move: Vector3) -> void:
 	var moving := is_on_floor() and move.length_squared() > 0.25
@@ -195,6 +166,18 @@ func _aim_along(node: Node3D, direction: Vector3) -> void:
 	node.look_at(node.global_position + direction, up)
 
 func _play_burst(particles: GPUParticles3D) -> void:
+	var material := particles.process_material as ParticleProcessMaterial
+	material.color = Color(1, 1, 1, 1)
+	var ramp := material.color_ramp as GradientTexture1D
+	var faded := bullet_color
+	faded.a = 0.0
+	var gradient := ramp.gradient
+	gradient.colors = PackedColorArray([bullet_color, faded])
+	ramp.gradient = gradient
+	var surface := (particles.draw_pass_1 as QuadMesh).material as StandardMaterial3D
+	surface.emission_enabled = true
+	surface.emission = Color(bullet_color.r, bullet_color.g, bullet_color.b, 1.0)
+	surface.emission_energy_multiplier = 2.0
 	particles.emitting = false
 	particles.restart()
 	particles.emitting = true

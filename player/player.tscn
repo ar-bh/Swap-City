@@ -52,7 +52,7 @@ _data = {
 point_count = 12
 
 [sub_resource type="Gradient" id="Gradient_muzzle"]
-colors = PackedColorArray(1, 0.8901961, 0.5411765, 1, 1, 0.8901961, 0.5411765, 0)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_muzzle"]
 gradient = SubResource("Gradient_muzzle")
@@ -68,12 +68,14 @@ gravity = Vector3(0, 0, 0)
 damping_min = 6.0000005
 damping_max = 8.0
 scale_min = 0.4
-color = Color(1, 0.8901961, 0.5411765, 1)
+color = Color(1, 1, 1, 1)
 color_ramp = SubResource("GradientTexture1D_muzzle")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spark"]
 transparency = 1
 shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(1, 1, 1, 1)
 billboard_mode = 3
 particles_anim_h_frames = 1
 particles_anim_v_frames = 1
