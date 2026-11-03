@@ -26,6 +26,8 @@ extends CharacterBody3D
 @export var swap_lift := 0.6
 @export var swap_side := 1.2
 @export var swap_fov_kick := 8.0
+## Degrees per second the enemy turns while finding the player again after a swap.
+@export var swap_turn_speed := 90.0
 
 enum Phase { TRACK, LOCK, FIRE }
 
@@ -38,6 +40,8 @@ var _aim: MeshInstance3D
 var _aim_mat: StandardMaterial3D
 ## True while the game is paused for this enemy's swap.
 var swapping := false
+# After a swap the enemy keeps its old facing and turns slowly until it faces the player again.
+var _recovering := false
 
 @onready var _blob: Node3D = %Blob
 @onready var _arm_aim: Node3D = %ArmAim
@@ -94,10 +98,15 @@ func _track(delta: float) -> void:
 		var target := _player.global_position + Vector3.UP * aim_height
 		_aim_at(target, delta)
 		var travel := target - _muzzle.global_position
-		if travel.length_squared() > 0.0001:
+		if _recovering:
+			_locked_dir = _facing_dir()
+		elif travel.length_squared() > 0.0001:
 			_locked_dir = travel.normalized()
 	_paint_aim(aim_color)
 	_show_aim(_muzzle.global_position, _locked_dir)
+	if _recovering:
+		# The shot cycle waits until the enemy has turned back to face the player.
+		return
 	_time += delta
 	if _time < track_time:
 		return
@@ -152,12 +161,26 @@ func _aim_at(target: Vector3, delta: float) -> void:
 	flat.y = 0.0
 	if flat.length_squared() > 0.0001:
 		var face := atan2(flat.x, flat.z)
-		_blob.rotation.y = lerp_angle(_blob.rotation.y, face, 1.0 - exp(-turn_follow * delta))
+		if _recovering:
+			_blob.rotation.y = rotate_toward(_blob.rotation.y, face, deg_to_rad(swap_turn_speed) * delta)
+			if absf(angle_difference(_blob.rotation.y, face)) < deg_to_rad(3.0):
+				_recovering = false
+		else:
+			_blob.rotation.y = lerp_angle(_blob.rotation.y, face, 1.0 - exp(-turn_follow * delta))
 	var from := _arm_aim.global_position
 	var offset := target - from
 	var horizontal := Vector2(offset.x, offset.z).length()
 	var pitch := atan2(offset.y, horizontal)
-	_arm_aim.rotation.x = lerp_angle(_arm_aim.rotation.x, -pitch, 1.0 - exp(-turn_follow * delta))
+	if _recovering:
+		_arm_aim.rotation.x = rotate_toward(_arm_aim.rotation.x, -pitch, deg_to_rad(swap_turn_speed) * delta)
+	else:
+		_arm_aim.rotation.x = lerp_angle(_arm_aim.rotation.x, -pitch, 1.0 - exp(-turn_follow * delta))
+
+## The direction the gun currently points, from the body's yaw and the arm's pitch.
+func _facing_dir() -> Vector3:
+	var yaw := _blob.rotation.y
+	var pitch := -_arm_aim.rotation.x
+	return Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
 
 func swap_with(visitor: Node3D) -> void:
 	if swapping:
@@ -214,9 +237,7 @@ func swap_with(visitor: Node3D) -> void:
 		var lift := Vector3.UP * swap_lift * bump
 		global_position = my_start.lerp(visitor_start, t) + lift + side * bump
 		visitor.global_position = visitor_start.lerp(my_start, t) + lift - side * bump
-		# The visitor ends up looking the way this enemy looked, and vice versa.
-		_blob.rotation.y = lerp_angle(my_face, visitor_face, t)
-		_arm_aim.rotation.x = lerp_angle(my_pitch, visitor_pitch, t)
+		# The visitor ends up looking the way this enemy looked; the enemy keeps its own facing.
 		if yaw_node != null and pitch_node != null:
 			yaw_node.rotation.y = lerp_angle(yaw_start, my_face - PI, t)
 			pitch_node.rotation.x = lerp_angle(pitch_start, -my_pitch, t)
@@ -236,6 +257,7 @@ func swap_with(visitor: Node3D) -> void:
 		_snap_feet(self)
 		_snap_feet(visitor)
 		swapping = false
+		_recovering = true
 		get_tree().paused = false
 		if other != null:
 			get_tree().create_timer(0.2, false, true).timeout.connect(func() -> void:
