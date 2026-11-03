@@ -146,6 +146,37 @@ func _aim_at(target: Vector3, delta: float) -> void:
 	var pitch := atan2(offset.y, horizontal)
 	_arm_aim.rotation.x = lerp_angle(_arm_aim.rotation.x, -pitch, 1.0 - exp(-turn_follow * delta))
 
+func swap_with(visitor: Node3D) -> void:
+	_swap_facing(visitor)
+	var spot := global_position
+	global_position = visitor.global_position
+	visitor.global_position = spot
+	velocity = Vector3.ZERO
+	_bullet.visible = false
+	_aim.visible = false
+	_time = 0.0
+	_phase = Phase.TRACK
+
+func _swap_facing(visitor: Node3D) -> void:
+	var yaw_node: Node3D = visitor.get_node_or_null("CameraYaw") as Node3D
+	var pitch_node: Node3D = visitor.get_node_or_null("CameraYaw/CameraPitch") as Node3D
+	if yaw_node == null or pitch_node == null:
+		return
+	var enemy_face := _blob.rotation.y
+	var enemy_pitch := _arm_aim.rotation.x
+	var visitor_face := yaw_node.rotation.y + PI
+	var visitor_pitch := -pitch_node.rotation.x
+	yaw_node.rotation.y = enemy_face - PI
+	pitch_node.rotation.x = -enemy_pitch
+	var visitor_blob: Node3D = visitor.get_node_or_null("Blob") as Node3D
+	if visitor_blob != null:
+		visitor_blob.rotation.y = enemy_face
+	var visitor_arm: Node3D = visitor.get_node_or_null("Blob/Skeleton/ArmAim") as Node3D
+	if visitor_arm != null:
+		visitor_arm.rotation.x = enemy_pitch
+	_blob.rotation.y = visitor_face
+	_arm_aim.rotation.x = visitor_pitch
+
 func _paint_aim(color: Color) -> void:
 	_aim_mat.albedo_color = color
 

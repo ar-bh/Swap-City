@@ -146,7 +146,15 @@ func _shoot() -> void:
 	_hit_spark.global_position = hit.position
 	_aim_along(_hit_spark, hit.normal)
 	_play_burst(_hit_spark)
-	print("Hit ", hit.collider.name)
+	_try_swap(hit.collider)
+
+func _try_swap(collider: Object) -> void:
+	var body: Node = collider as Node
+	if body == null or not body.has_method("swap_with"):
+		print("Hit ", body.name)
+		return
+	body.swap_with(self)
+	velocity = Vector3.ZERO
 
 func _camera_hit() -> Vector3:
 	var from := _camera.global_position
