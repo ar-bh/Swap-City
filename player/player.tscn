@@ -68,14 +68,12 @@ gravity = Vector3(0, 0, 0)
 damping_min = 6.0000005
 damping_max = 8.0
 scale_min = 0.4
-color = Color(1, 1, 1, 1)
 color_ramp = SubResource("GradientTexture1D_muzzle")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spark"]
 transparency = 1
 shading_mode = 0
 vertex_color_use_as_albedo = true
-albedo_color = Color(1, 1, 1, 1)
 billboard_mode = 3
 particles_anim_h_frames = 1
 particles_anim_v_frames = 1
@@ -146,7 +144,6 @@ size = Vector3(0.035, 0.035, 1)
 [node name="Player" type="CharacterBody3D" unique_id=179349838 groups=["player"]]
 script = ExtResource("1_yw30f")
 tracer_time = 0.3
-bullet_color = Color(0.3647, 0.9059, 0.6196, 1)
 bullet_width = 0.07500000000000001
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1635119416]

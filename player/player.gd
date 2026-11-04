@@ -1,6 +1,9 @@
 class_name Player
 extends CharacterBody3D
 
+@export_group("Swap")
+@export var swappable := true
+
 @export var speed := 8.0
 @export var accel := 60.0
 @export var air_accel := 30.0
@@ -149,6 +152,8 @@ func _shoot() -> void:
 	_try_swap(hit.collider)
 
 func _try_swap(collider: Object) -> void:
+	if not swappable:
+		return
 	var body: Node = collider as Node
 	if body == null or not body.has_method("swap_with"):
 		print("Hit ", body.name)

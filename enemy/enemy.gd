@@ -17,6 +17,7 @@ extends CharacterBody3D
 @export var gravity := 9.8 * 3.0
 
 @export_group("Swap")
+@export var swappable := true
 ## Frozen beat before the bodies start moving.
 @export var swap_freeze := 0.2
 ## How long the two bodies take to trade places while the game is paused.
@@ -35,9 +36,14 @@ var _phase: Phase = Phase.TRACK
 var _time := 0.0
 var _locked_dir := Vector3(0.0, 0.0, 1.0)
 var _range_left := 0.0
+# The bullet flies on its own, so a swap mid-flight does not stop it.
+var _flying := false
+var _bullet_dir := Vector3(0.0, 0.0, 1.0)
 var _player: Node3D
 var _aim: MeshInstance3D
 var _aim_mat: StandardMaterial3D
+# A separate red line follows the bullet, so it stays even after a swap hands _aim back to tracking.
+var _shot_line: MeshInstance3D
 ## True while the game is paused for this enemy's swap.
 var swapping := false
 # After a swap the enemy keeps its old facing and turns slowly until it faces the player again.
@@ -62,17 +68,24 @@ func _ready() -> void:
 		bullet_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		bullet_mat.albedo_color = bullet_color
 		bullet_mat.emission_enabled = false
-	_aim = MeshInstance3D.new()
-	_aim.name = "AimLine"
-	_aim.top_level = true
+	_aim = _make_line("AimLine", aim_color)
+	_aim_mat = (_aim.mesh as BoxMesh).material as StandardMaterial3D
+	_shot_line = _make_line("ShotLine", lock_color)
+	_shot_line.visible = false
+
+func _make_line(line_name: String, color: Color) -> MeshInstance3D:
+	var node := MeshInstance3D.new()
+	node.name = line_name
+	node.top_level = true
 	var line := BoxMesh.new()
 	line.size = Vector3(aim_thickness, aim_thickness, 1.0)
-	_aim_mat = StandardMaterial3D.new()
-	_aim_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_aim_mat.albedo_color = aim_color
-	line.material = _aim_mat
-	_aim.mesh = line
-	add_child(_aim)
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = color
+	line.material = mat
+	node.mesh = line
+	add_child(node)
+	return node
 
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
@@ -81,13 +94,13 @@ func _physics_process(delta: float) -> void:
 	velocity.z = 0.0
 	move_and_slide()
 	_find_player()
+	if _flying:
+		_fly(delta)
 	match _phase:
 		Phase.TRACK:
 			_track(delta)
 		Phase.LOCK:
 			_lock(delta)
-		Phase.FIRE:
-			_fly(delta)
 
 func _find_player() -> void:
 	if _player == null or not is_instance_valid(_player):
@@ -103,9 +116,9 @@ func _track(delta: float) -> void:
 		elif travel.length_squared() > 0.0001:
 			_locked_dir = travel.normalized()
 	_paint_aim(aim_color)
-	_show_aim(_muzzle.global_position, _locked_dir)
-	if _recovering:
-		# The shot cycle waits until the enemy has turned back to face the player.
+	_show_line(_aim, _muzzle.global_position, _locked_dir)
+	if _recovering or not _sees_player():
+		_time = 0.0
 		return
 	_time += delta
 	if _time < track_time:
@@ -115,7 +128,7 @@ func _track(delta: float) -> void:
 
 func _lock(delta: float) -> void:
 	_paint_aim(lock_color)
-	_show_aim(_muzzle.global_position, _locked_dir)
+	_show_line(_aim, _muzzle.global_position, _locked_dir)
 	_time += delta
 	if _time < lock_time:
 		return
@@ -123,7 +136,10 @@ func _lock(delta: float) -> void:
 	_bullet.visible = true
 	_bullet.global_position = _muzzle.global_position + _locked_dir * 0.2
 	_range_left = shot_range
-	_show_aim(_bullet.global_position, _locked_dir)
+	_bullet_dir = _locked_dir
+	_flying = true
+	_aim.visible = false
+	_show_line(_shot_line, _bullet.global_position, _bullet_dir)
 	_phase = Phase.FIRE
 
 func _fly(delta: float) -> void:
@@ -131,25 +147,25 @@ func _fly(delta: float) -> void:
 	if step > _range_left:
 		step = _range_left
 	var from := _bullet.global_position
-	var to := from + _locked_dir * step
+	var to := from + _bullet_dir * step
 	var hit := _raycast(from, to)
 	_range_left -= step
 	if not hit.is_empty():
 		_bullet.global_position = hit.position
-		_aim.visible = false
 		_end_shot(hit)
 		return
 	_bullet.global_position = to
-	_show_aim(_bullet.global_position, _locked_dir)
+	_show_line(_shot_line, _bullet.global_position, _bullet_dir)
 	if _range_left <= 0.0:
-		_aim.visible = false
 		_end_shot({})
 
 func _end_shot(hit: Dictionary) -> void:
 	_bullet.visible = false
-	_aim.visible = false
-	_time = 0.0
-	_phase = Phase.TRACK
+	_shot_line.visible = false
+	_flying = false
+	if _phase == Phase.FIRE:
+		_time = 0.0
+		_phase = Phase.TRACK
 	if hit.is_empty():
 		return
 	var collider := hit.collider as Object
@@ -183,11 +199,10 @@ func _facing_dir() -> Vector3:
 	return Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
 
 func swap_with(visitor: Node3D) -> void:
-	if swapping:
+	if swapping or not swappable:
 		return
 	swapping = true
 	velocity = Vector3.ZERO
-	_bullet.visible = false
 	_aim.visible = false
 	_time = 0.0
 	_phase = Phase.TRACK
@@ -197,6 +212,10 @@ func swap_with(visitor: Node3D) -> void:
 	var visitor_blob := visitor.get_node_or_null("Blob") as Node3D
 	var visitor_arm := visitor.get_node_or_null("%ArmAim") as Node3D
 	var camera := visitor.get_node_or_null("%Camera3D") as Camera3D
+	# The player's shot ends on contact; only this enemy's bullet stays in the air.
+	var tracer := visitor.get_node_or_null("Tracer") as Node3D
+	if tracer != null:
+		tracer.visible = false
 
 	var my_start := global_position
 	var visitor_start := visitor.global_position
@@ -272,9 +291,9 @@ func _snap_feet(body: Node) -> void:
 func _paint_aim(color: Color) -> void:
 	_aim_mat.albedo_color = color
 
-func _show_aim(from: Vector3, direction: Vector3) -> void:
+func _show_line(line: MeshInstance3D, from: Vector3, direction: Vector3) -> void:
 	if direction.length_squared() < 0.0001:
-		_aim.visible = false
+		line.visible = false
 		return
 	var dir := direction.normalized()
 	var end := from + dir * shot_range
@@ -283,12 +302,12 @@ func _show_aim(from: Vector3, direction: Vector3) -> void:
 		end = hit.position
 	var length := from.distance_to(end)
 	if length < 0.05:
-		_aim.visible = false
+		line.visible = false
 		return
-	_aim.visible = true
-	_aim.global_position = (from + end) * 0.5
-	_point_along(_aim, dir)
-	_aim.scale = Vector3(1.0, 1.0, length)
+	line.visible = true
+	line.global_position = (from + end) * 0.5
+	_point_along(line, dir)
+	line.scale = Vector3(1.0, 1.0, length)
 
 func _point_along(node: Node3D, direction: Vector3) -> void:
 	var up := Vector3.RIGHT if absf(direction.normalized().dot(Vector3.UP)) > 0.99 else Vector3.UP
@@ -301,3 +320,13 @@ func _raycast(from: Vector3, to: Vector3, through_player: bool = false) -> Dicti
 		skip.append((_player as CollisionObject3D).get_rid())
 	query.exclude = skip
 	return get_world_3d().direct_space_state.intersect_ray(query)
+
+func _sees_player() -> bool:
+	if _player == null:
+		return false
+	var target := _player.global_position + Vector3.UP * aim_height
+	var hit := _raycast(_muzzle.global_position, target, false)
+	if hit.is_empty():
+		return true
+	var collider := hit.collider as Object
+	return collider is Player or (collider is Node and (collider as Node).is_in_group("player"))
