@@ -46,6 +46,7 @@ var _aim_mat: StandardMaterial3D
 var _shot_line: MeshInstance3D
 ## True while the game is paused for this enemy's swap.
 var swapping := false
+var _restarting := false
 # After a swap the enemy keeps its old facing and turns slowly until it faces the player again.
 var _recovering := false
 
@@ -110,11 +111,7 @@ func _track(delta: float) -> void:
 	if _player != null:
 		var target := _player.global_position + Vector3.UP * aim_height
 		_aim_at(target, delta)
-		var travel := target - _muzzle.global_position
-		if _recovering:
-			_locked_dir = _facing_dir()
-		elif travel.length_squared() > 0.0001:
-			_locked_dir = travel.normalized()
+		_locked_dir = _barrel_dir()
 	_paint_aim(aim_color)
 	_show_line(_aim, _muzzle.global_position, _locked_dir)
 	if _recovering or not _sees_player():
@@ -123,6 +120,9 @@ func _track(delta: float) -> void:
 	_time += delta
 	if _time < track_time:
 		return
+	if _player != null:
+		_snap_barrel_at(_player.global_position + Vector3.UP * aim_height)
+		_locked_dir = _barrel_dir()
 	_time = 0.0
 	_phase = Phase.LOCK
 
@@ -159,6 +159,16 @@ func _fly(delta: float) -> void:
 	if _range_left <= 0.0:
 		_end_shot({})
 
+func _restart_level() -> void:
+	if _restarting:
+		return
+	_restarting = true
+	var tree := get_tree()
+	if tree == null:
+		return
+	tree.paused = false
+	tree.call_deferred("reload_current_scene")
+
 func _end_shot(hit: Dictionary) -> void:
 	_bullet.visible = false
 	_shot_line.visible = false
@@ -170,33 +180,48 @@ func _end_shot(hit: Dictionary) -> void:
 		return
 	var collider := hit.collider as Object
 	if collider is Player or (collider is Node and (collider as Node).is_in_group("player")):
-		get_tree().reload_current_scene()
+		(collider as Player).launch(_bullet_dir, true)
 
 func _aim_at(target: Vector3, delta: float) -> void:
-	var flat := target - _blob.global_position
-	flat.y = 0.0
-	if flat.length_squared() > 0.0001:
-		var face := atan2(flat.x, flat.z)
-		if _recovering:
-			_blob.rotation.y = rotate_toward(_blob.rotation.y, face, deg_to_rad(swap_turn_speed) * delta)
-			if absf(angle_difference(_blob.rotation.y, face)) < deg_to_rad(3.0):
-				_recovering = false
-		else:
-			_blob.rotation.y = lerp_angle(_blob.rotation.y, face, 1.0 - exp(-turn_follow * delta))
-	var from := _arm_aim.global_position
-	var offset := target - from
-	var horizontal := Vector2(offset.x, offset.z).length()
-	var pitch := atan2(offset.y, horizontal)
+	var current_yaw := _blob.rotation.y
+	var current_pitch := _arm_aim.rotation.x
+	var solved := _barrel_angles(target, current_yaw, current_pitch)
 	if _recovering:
-		_arm_aim.rotation.x = rotate_toward(_arm_aim.rotation.x, -pitch, deg_to_rad(swap_turn_speed) * delta)
-	else:
-		_arm_aim.rotation.x = lerp_angle(_arm_aim.rotation.x, -pitch, 1.0 - exp(-turn_follow * delta))
+		_blob.rotation.y = rotate_toward(current_yaw, solved.x, deg_to_rad(swap_turn_speed) * delta)
+		_arm_aim.rotation.x = rotate_toward(current_pitch, solved.y, deg_to_rad(swap_turn_speed) * delta)
+		if absf(angle_difference(_blob.rotation.y, solved.x)) < deg_to_rad(3.0):
+			_recovering = false
+		return
+	var follow := 1.0 - exp(-turn_follow * delta)
+	_blob.rotation.y = lerp_angle(current_yaw, solved.x, follow)
+	_arm_aim.rotation.x = lerp_angle(current_pitch, solved.y, follow)
 
-## The direction the gun currently points, from the body's yaw and the arm's pitch.
-func _facing_dir() -> Vector3:
-	var yaw := _blob.rotation.y
-	var pitch := -_arm_aim.rotation.x
-	return Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
+## Yaw and pitch that point the barrel at the target. The pistol sits in the
+## right hand, so the body ends up turned a little off the target.
+func _barrel_angles(target: Vector3, yaw: float, pitch: float) -> Vector2:
+	for _step in 5:
+		_blob.rotation.y = yaw
+		_arm_aim.rotation.x = pitch
+		var to_target := target - _muzzle.global_position
+		if to_target.length_squared() < 0.0001:
+			break
+		var dir := to_target.normalized()
+		yaw = atan2(dir.x, dir.z)
+		var horizontal := Vector2(dir.x, dir.z).length()
+		pitch = -atan2(dir.y, horizontal)
+	return Vector2(yaw, pitch)
+
+func _snap_barrel_at(target: Vector3) -> void:
+	var solved := _barrel_angles(target, _blob.rotation.y, _arm_aim.rotation.x)
+	_blob.rotation.y = solved.x
+	_arm_aim.rotation.x = solved.y
+
+## Where the pistol barrel points right now.
+func _barrel_dir() -> Vector3:
+	var barrel := _muzzle.global_basis.z
+	if barrel.length_squared() < 0.0001:
+		return Vector3(0.0, 0.0, 1.0)
+	return barrel.normalized()
 
 func swap_with(visitor: Node3D) -> void:
 	if swapping or not swappable:
@@ -280,8 +305,9 @@ func swap_with(visitor: Node3D) -> void:
 		get_tree().paused = false
 		if other != null:
 			get_tree().create_timer(0.2, false, true).timeout.connect(func() -> void:
-				remove_collision_exception_with(other)
-				other.remove_collision_exception_with(self)))
+				if is_instance_valid(self) and is_instance_valid(other):
+					remove_collision_exception_with(other)
+					other.remove_collision_exception_with(self)))
 
 func _snap_feet(body: Node) -> void:
 	var legs := body.get_node_or_null("Blob/Skeleton/Legs")

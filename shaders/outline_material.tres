@@ -1,9 +1,22 @@
 [gd_resource type="ShaderMaterial" format=3 uid="uid://comcoe0e71vmy"]
 
-[ext_resource type="Shader" uid="uid://b00425d3nji5s" path="res://shaders/outline.gdshader" id="1_2cd1o"]
+[sub_resource type="Shader" id="Shader_y5vj3"]
+code = "shader_type spatial;
+render_mode unshaded, cull_front, shadows_disabled;
+
+uniform vec4 outline_color : source_color = vec4(0.0, 0.0, 0.0, 1.0);
+uniform float outline_width : hint_range(0.0, 0.2) = 0.045;
+
+void vertex() {
+	VERTEX += NORMAL * outline_width;
+}
+
+void fragment() {
+	ALBEDO = outline_color.rgb;
+}"
 
 [resource]
 render_priority = 0
-shader = ExtResource("1_2cd1o")
+shader = SubResource("Shader_y5vj3")
 shader_parameter/outline_color = Color(0, 0, 0, 1)
 shader_parameter/outline_width = 0.02400000114

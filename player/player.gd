@@ -33,6 +33,11 @@ extends CharacterBody3D
 @export var bullet_color := Color(0.3647, 0.9059, 0.6196, 1.0)
 @export_range(0.005, 0.3, 0.005) var bullet_width := 0.035
 
+@export_group("Knockback")
+@export var knockback_speed := 42.0
+@export var knockback_up := 22.0
+@export var ragdoll_time := 2.6
+
 var _bob := 0.0
 var _bob_amount := 0.0
 var _model_rest_y := 0.0
@@ -41,6 +46,11 @@ var _buffer := 0.0
 var _was_on_floor := true
 var _dip := 0.0
 var _dip_vel := 0.0
+var _ragdoll := false
+var _watch := false
+var _restarting := false
+var _spin := Vector3.ZERO
+var _ragdoll_left := 0.0
 
 @onready var _model: Node3D = $Blob
 @onready var _arm_aim: Node3D = %ArmAim
@@ -61,6 +71,8 @@ func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _ragdoll:
+		return
 	if event.is_action_pressed("shoot") and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		_shoot()
 		return
@@ -74,7 +86,38 @@ func _unhandled_input(event: InputEvent) -> void:
 		var pitch := _camera_pitch.rotation.x - motion.relative.y * mouse_sensitivity
 		_camera_pitch.rotation.x = clampf(pitch, deg_to_rad(min_pitch), deg_to_rad(max_pitch))
 
+func launch(direction: Vector3, hold_camera: bool = false) -> void:
+	if _ragdoll:
+		return
+	_ragdoll = true
+	_watch = hold_camera
+	var flat := Vector3(direction.x, 0.0, direction.z)
+	if flat.length_squared() < 0.0001:
+		flat = -global_basis.z
+		flat.y = 0.0
+	flat = flat.normalized()
+	velocity = flat * knockback_speed + Vector3.UP * knockback_up
+	_spin = Vector3(randf_range(-2.5, 2.5), randf_range(-2.0, 2.0), randf_range(-2.5, 2.5))
+	_ragdoll_left = ragdoll_time
+	_go_limp(flat)
+	if not hold_camera:
+		return
+	var held := _camera.global_transform
+	_camera.reparent(get_tree().current_scene)
+	_camera.global_transform = held
+
+func _go_limp(direction: Vector3) -> void:
+	var legs := get_node_or_null("Blob/Skeleton/Legs") as Node
+	if legs != null and legs.has_method("ragdoll"):
+		legs.call("ragdoll", direction)
+	var arms := get_node_or_null("Blob/Skeleton/Arms") as Node
+	if arms != null and arms.has_method("ragdoll"):
+		arms.call("ragdoll", direction)
+
 func _physics_process(delta: float) -> void:
+	if _ragdoll:
+		_ragdoll_step(delta)
+		return
 	if is_on_floor():
 		_coyote = coyote_time
 	else:
@@ -149,17 +192,49 @@ func _shoot() -> void:
 	_hit_spark.global_position = hit.position
 	_aim_along(_hit_spark, hit.normal)
 	_play_burst(_hit_spark)
-	_try_swap(hit.collider)
+	_try_swap(hit.collider, direction)
 
-func _try_swap(collider: Object) -> void:
-	if not swappable:
-		return
+func _try_swap(collider: Object, _direction: Vector3) -> void:
 	var body: Node = collider as Node
-	if body == null or not body.has_method("swap_with"):
-		print("Hit ", body.name)
+	if body == null:
+		return
+	if not swappable or not body.has_method("swap_with"):
+		return
+	if body.get("swappable") != true:
 		return
 	body.swap_with(self)
 	velocity = Vector3.ZERO
+
+func _ragdoll_step(delta: float) -> void:
+	var falling := velocity.y
+	velocity.y -= gravity * delta
+	var axis := _spin.normalized() if _spin.length_squared() > 0.001 else Vector3.RIGHT
+	_model.rotate(axis, _spin.length() * delta)
+	move_and_slide()
+	if is_on_floor() and falling < -2.0:
+		velocity.y = -falling * 0.55
+		velocity.x *= 0.72
+		velocity.z *= 0.72
+		_spin *= 0.6
+	if _watch:
+		var focus := global_position + Vector3.UP * 1.4
+		var to_focus := focus - _camera.global_position
+		if to_focus.length_squared() > 0.001:
+			var up := Vector3.RIGHT if absf(to_focus.normalized().dot(Vector3.UP)) > 0.99 else Vector3.UP
+			_camera.look_at(focus, up)
+		_ragdoll_left -= delta
+		if _ragdoll_left <= 0.0:
+			_restart_level()
+
+func _restart_level() -> void:
+	if _restarting:
+		return
+	_restarting = true
+	var tree := get_tree()
+	if tree == null:
+		return
+	tree.paused = false
+	tree.call_deferred("reload_current_scene")
 
 func _camera_hit() -> Vector3:
 	var from := _camera.global_position

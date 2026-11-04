@@ -12,6 +12,27 @@
 radius = 1.1
 height = 3.5
 
+[sub_resource type="Shader" id="Shader_y5vj3"]
+code = "shader_type spatial;
+render_mode unshaded, cull_front, shadows_disabled;
+
+uniform vec4 outline_color : source_color = vec4(0.0, 0.0, 0.0, 1.0);
+uniform float outline_width : hint_range(0.0, 0.2) = 0.045;
+
+void vertex() {
+	VERTEX += NORMAL * outline_width;
+}
+
+void fragment() {
+	ALBEDO = outline_color.rgb;
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5ffra"]
+render_priority = 0
+shader = SubResource("Shader_y5vj3")
+shader_parameter/outline_color = Color(1, 0, 0, 1)
+shader_parameter/outline_width = 0.098000004655
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oul6g"]
 albedo_color = Color(1, 1, 0, 1)
 
@@ -124,7 +145,7 @@ shape = SubResource("CapsuleShape3D_mn11d")
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.45, 0)
 script = ExtResource("3_0iqx3")
-outline_material = ExtResource("4_vqlsk")
+outline_material = SubResource("ShaderMaterial_5ffra")
 
 [node name="Skeleton" type="Skeleton3D" parent="Blob" unique_id=1317010121]
 bones/0/name = "RightHip"
