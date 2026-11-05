@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://s4ejwlxbccnr" path="res://assets/crosshair.png" id="8_rgyib"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mn11d"]
-radius = 1.1
+radius = 0.9111328
 height = 3.5
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oul6g"]
@@ -62,8 +62,8 @@ emission_shape = 1
 emission_sphere_radius = 0.04
 direction = Vector3(0, 0, 1)
 spread = 28.0
-initial_velocity_min = 2.5
-initial_velocity_max = 5.0
+initial_velocity_min = 6.0
+initial_velocity_max = 11.0
 gravity = Vector3(0, 0, 0)
 damping_min = 6.0000005
 damping_max = 8.0
@@ -118,8 +118,8 @@ emission_shape = 1
 emission_sphere_radius = 0.02
 direction = Vector3(0, 0, -1)
 spread = 55.0
-initial_velocity_min = 1.5
-initial_velocity_max = 4.0
+initial_velocity_min = 5.0
+initial_velocity_max = 10.0
 gravity = Vector3(0, -4, 0)
 damping_min = 2.0
 damping_max = 3.0
@@ -137,14 +137,17 @@ transparency = 1
 shading_mode = 0
 albedo_color = Color(1, 0.94509804, 0.6901961, 1)
 
-[sub_resource type="BoxMesh" id="BoxMesh_tracer"]
+[sub_resource type="CylinderMesh" id="BoxMesh_tracer"]
 material = SubResource("StandardMaterial3D_tracer")
-size = Vector3(0.035, 0.035, 1)
+top_radius = 0.5
+bottom_radius = 0.5
+height = 1.0
+radial_segments = 16
 
 [node name="Player" type="CharacterBody3D" unique_id=179349838 groups=["player"]]
 script = ExtResource("1_yw30f")
-tracer_time = 0.3
-bullet_width = 0.07500000000000001
+tracer_time = 0.45
+bullet_width = 0.075
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1635119416]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
@@ -410,8 +413,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2692678, 0.6984763)
 [node name="MuzzleFlash" type="GPUParticles3D" parent="Blob/Skeleton/ArmAim/RightHandTarget/GunMount/Muzzle" unique_id=1819767480]
 unique_name_in_owner = true
 emitting = false
-amount = 10
-lifetime = 0.12
+amount = 16
+lifetime = 0.22
 one_shot = true
 explosiveness = 1.0
 local_coords = true
@@ -527,8 +530,8 @@ expand_mode = 1
 unique_name_in_owner = true
 top_level = true
 emitting = false
-amount = 18
-lifetime = 0.28
+amount = 22
+lifetime = 0.36
 one_shot = true
 explosiveness = 1.0
 visibility_aabb = AABB(-2, -2, -2, 4, 4, 4)

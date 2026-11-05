@@ -29,9 +29,10 @@ extends CharacterBody3D
 
 @export_group("Shot")
 @export var shot_range := 80.0
-@export var tracer_time := 0.06
+@export var bullet_speed := 180.0
+@export var tracer_time := 0.45
 @export var bullet_color := Color(0.3647, 0.9059, 0.6196, 1.0)
-@export_range(0.005, 0.3, 0.005) var bullet_width := 0.035
+@export_range(0.005, 0.3, 0.005) var bullet_width := 0.075
 
 @export_group("Knockback")
 @export var knockback_speed := 42.0
@@ -51,6 +52,29 @@ var _watch := false
 var _restarting := false
 var _spin := Vector3.ZERO
 var _ragdoll_left := 0.0
+var _shot_flying := false
+var _shot_from := Vector3.ZERO
+var _shot_tip := Vector3.ZERO
+var _shot_dir := Vector3.ZERO
+var _shot_left := 0.0
+var _first_person := false
+var _view_blend := 0.0
+var _spring_rest_pos := Vector3.ZERO
+var _spring_rest_length := 5.5
+var _hand_rest := Vector3.ZERO
+var _pole_rest := Vector3.ZERO
+var _left_hand_rest := Vector3.ZERO
+var _gun_rest_basis := Basis.IDENTITY
+var _gun_rest_scale := Vector3.ONE
+var _camera_near_rest := 0.05
+var _body_meshes: Array[GeometryInstance3D] = []
+
+# First-person pose, in the same local space as the third-person rig.
+const _FP_HAND := Vector3(-0.34, 0.12, 0.9)
+const _FP_POLE := Vector3(-0.8, -0.2, 0.4)
+const _FP_LEFT_HAND := Vector3(0.9, -1.0, -0.35)
+const _FP_EYE := Vector3(0.0, 0.66, 0.0)
+const _FP_GUN_SCALE := 0.8
 
 @onready var _model: Node3D = $Blob
 @onready var _arm_aim: Node3D = %ArmAim
@@ -63,16 +87,38 @@ var _ragdoll_left := 0.0
 @onready var _muzzle_flash: GPUParticles3D = %MuzzleFlash
 @onready var _hit_spark: GPUParticles3D = %HitSpark
 @onready var _tracer: MeshInstance3D = $Tracer
+@onready var _hand: Marker3D = %RightHandTarget
+@onready var _left_hand: Marker3D = %LeftHandTarget
+@onready var _gun_mount: Node3D = %GunMount
+@onready var _arm_pole: Marker3D = %ArmAim/RightArmPole
+@onready var _gun_model: Node3D = %GunMount/SpaceGun
 
 func _ready() -> void:
 	_model_rest_y = _model.position.y
 	_model.rotation.y = _face_yaw()
 	_spring_arm.add_excluded_object(get_rid())
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	# The swap freezes the game, and these bursts have to keep playing through that.
+	_muzzle_flash.process_mode = Node.PROCESS_MODE_ALWAYS
+	_hit_spark.process_mode = Node.PROCESS_MODE_ALWAYS
+	_spring_rest_pos = _spring_arm.position
+	_spring_rest_length = _spring_arm.spring_length
+	_hand_rest = _hand.position
+	_pole_rest = _arm_pole.position
+	_left_hand_rest = _left_hand.position
+	_gun_rest_basis = _gun_mount.basis
+	_gun_rest_scale = _gun_model.scale
+	_camera_near_rest = _camera.near
+	_collect_body_meshes(_model)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _ragdoll:
 		return
+	if event is InputEventKey:
+		var key := event as InputEventKey
+		if key.pressed and not key.echo and key.physical_keycode == KEY_SHIFT:
+			_first_person = not _first_person
+			return
 	if event.is_action_pressed("shoot") and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		_shoot()
 		return
@@ -115,6 +161,8 @@ func _go_limp(direction: Vector3) -> void:
 		arms.call("ragdoll", direction)
 
 func _physics_process(delta: float) -> void:
+	if _shot_flying:
+		_advance_shot(delta)
 	if _ragdoll:
 		_ragdoll_step(delta)
 		return
@@ -157,9 +205,47 @@ func _physics_process(delta: float) -> void:
 	_model.rotation.y = lerp_angle(_model.rotation.y, _face_yaw(), 1.0 - exp(-turn_follow * delta))
 	_arm_aim.rotation.x = -_camera_pitch.rotation.x
 	_bob_body(delta, flat)
+	_update_view(delta)
 
 func _face_yaw() -> float:
 	return _camera_yaw.rotation.y + PI
+
+func _update_view(delta: float) -> void:
+	var target := 0.0
+	if _first_person:
+		target = 1.0
+	_view_blend = lerpf(_view_blend, target, 1.0 - exp(-14.0 * delta))
+	if not _first_person and _view_blend < 0.001:
+		_view_blend = 0.0
+	if _first_person and _view_blend > 0.999:
+		_view_blend = 1.0
+	var blend := _view_blend
+	_spring_arm.position = _spring_rest_pos.lerp(Vector3.ZERO, blend)
+	_spring_arm.spring_length = lerpf(_spring_rest_length, 0.0, blend)
+	_camera.near = lerpf(_camera_near_rest, 0.02, blend)
+	_hand.position = _hand_rest.lerp(_FP_HAND, blend)
+	_arm_pole.position = _pole_rest.lerp(_FP_POLE, blend)
+	_left_hand.position = _left_hand_rest.lerp(_FP_LEFT_HAND, blend)
+	_gun_mount.basis = _gun_rest_basis.slerp(_fp_gun_basis(), blend)
+	_gun_model.scale = _gun_rest_scale.lerp(_gun_rest_scale * _FP_GUN_SCALE, blend)
+	var show_body := not _first_person and blend < 0.45
+	for mesh in _body_meshes:
+		mesh.visible = show_body
+
+func _fp_gun_basis() -> Basis:
+	var look_point := _FP_EYE + Vector3(0.0, 0.0, 8.0)
+	var aim := (look_point - _FP_HAND).normalized()
+	# The visible barrel is the model's -X. Point that down the crosshair.
+	var local_barrel := -_gun_model.transform.basis.x.normalized()
+	return Basis(Quaternion(local_barrel, aim))
+
+func _collect_body_meshes(node: Node) -> void:
+	if node.name == "Skeleton":
+		return
+	if node is GeometryInstance3D:
+		_body_meshes.append(node)
+	for child in node.get_children():
+		_collect_body_meshes(child)
 
 func _bob_body(delta: float, move: Vector3) -> void:
 	var moving := is_on_floor() and move.length_squared() > 0.25
@@ -181,29 +267,30 @@ func _shoot() -> void:
 		return
 	var direction := travel.normalized()
 	var start := from + direction * 0.2
-	var hit := _raycast(start, start + direction * shot_range)
-	var end := start + direction * shot_range
-	if not hit.is_empty():
-		end = hit.position
+	_aim_muzzle_flash(direction)
 	_play_burst(_muzzle_flash)
-	_show_tracer(start, end)
-	if hit.is_empty():
-		return
-	_hit_spark.global_position = hit.position
-	_aim_along(_hit_spark, hit.normal)
-	_play_burst(_hit_spark)
-	_try_swap(hit.collider, direction)
+	_shot_from = start
+	_shot_tip = start
+	_shot_dir = direction
+	_shot_left = shot_range
+	_shot_flying = true
+	var mat := _tracer.get_active_material(0) as StandardMaterial3D
+	mat.albedo_color = bullet_color
+	mat.emission_enabled = true
+	mat.emission = Color(bullet_color.r, bullet_color.g, bullet_color.b, 1.0)
+	mat.emission_energy_multiplier = 2.0
+	_tracer.visible = true
+	_draw_shot()
 
 func _try_swap(collider: Object, _direction: Vector3) -> void:
 	var body: Node = collider as Node
-	if body == null:
-		return
-	if not swappable or not body.has_method("swap_with"):
-		return
-	if body.get("swappable") != true:
+	if body == null or not swappable or not body.has_method("swap_with") or body.get("swappable") != true:
+		_tracer.visible = false
 		return
 	body.swap_with(self)
 	velocity = Vector3.ZERO
+	if body.get("swapping") != true:
+		_tracer.visible = false
 
 func _ragdoll_step(delta: float) -> void:
 	var falling := velocity.y
@@ -249,6 +336,13 @@ func _raycast(from: Vector3, to: Vector3) -> Dictionary:
 	query.exclude = [get_rid()]
 	return get_world_3d().direct_space_state.intersect_ray(query)
 
+func _aim_muzzle_flash(direction: Vector3) -> void:
+	var up := Vector3.RIGHT if absf(direction.dot(Vector3.UP)) > 0.99 else Vector3.UP
+	var side := up.cross(direction).normalized()
+	var lifted := direction.cross(side).normalized()
+	_muzzle_flash.global_position = _muzzle.global_position
+	_muzzle_flash.global_basis = Basis(side, lifted, direction)
+
 func _aim_along(node: Node3D, direction: Vector3) -> void:
 	var up := Vector3.RIGHT if absf(direction.normalized().dot(Vector3.UP)) > 0.99 else Vector3.UP
 	node.look_at(node.global_position + direction, up)
@@ -270,19 +364,40 @@ func _play_burst(particles: GPUParticles3D) -> void:
 	particles.restart()
 	particles.emitting = true
 
-func _show_tracer(from: Vector3, to: Vector3) -> void:
-	var length := from.distance_to(to)
-	if length < 0.05:
+func _advance_shot(delta: float) -> void:
+	var step := minf(bullet_speed * delta, _shot_left)
+	var next := _shot_tip + _shot_dir * step
+	var hit := _raycast(_shot_tip, next)
+	if not hit.is_empty():
+		_shot_tip = hit.position
+		_draw_shot()
+		_end_shot(hit)
 		return
-	_tracer.visible = true
-	_tracer.global_position = (from + to) * 0.5
-	_aim_along(_tracer, to - from)
-	var thickness := bullet_width / 0.035
-	_tracer.scale = Vector3(thickness, thickness, length)
-	var mat := _tracer.get_active_material(0) as StandardMaterial3D
-	mat.albedo_color = bullet_color
-	mat.emission = Color(bullet_color.r, bullet_color.g, bullet_color.b, 1.0)
-	var tween := create_tween()
-	tween.tween_property(mat, "albedo_color:a", 0.0, tracer_time)
-	tween.tween_callback(func() -> void:
-		_tracer.visible = false)
+	_shot_tip = next
+	_shot_left -= step
+	_draw_shot()
+	if _shot_left <= 0.0:
+		_shot_flying = false
+		_tracer.visible = false
+
+func _end_shot(hit: Dictionary) -> void:
+	_shot_flying = false
+	_hit_spark.global_position = hit.position
+	var normal: Vector3 = hit.normal
+	_aim_along(_hit_spark, normal)
+	_play_burst(_hit_spark)
+	_try_swap(hit.collider, _shot_dir)
+
+func _draw_shot() -> void:
+	var travel := _shot_tip - _shot_from
+	var length := travel.length()
+	if length < 0.02:
+		_tracer.scale = Vector3(bullet_width, 0.02, bullet_width)
+		_tracer.global_position = _shot_from
+		return
+	var dir := travel / length
+	var up := Vector3.RIGHT if absf(dir.dot(Vector3.UP)) > 0.99 else Vector3.UP
+	var side := dir.cross(up).normalized()
+	_tracer.global_position = (_shot_from + _shot_tip) * 0.5
+	_tracer.global_basis = Basis(side, dir, side.cross(dir).normalized())
+	_tracer.scale = Vector3(bullet_width, length, bullet_width)

@@ -237,10 +237,6 @@ func swap_with(visitor: Node3D) -> void:
 	var visitor_blob := visitor.get_node_or_null("Blob") as Node3D
 	var visitor_arm := visitor.get_node_or_null("%ArmAim") as Node3D
 	var camera := visitor.get_node_or_null("%Camera3D") as Camera3D
-	# The player's shot ends on contact; only this enemy's bullet stays in the air.
-	var tracer := visitor.get_node_or_null("Tracer") as Node3D
-	if tracer != null:
-		tracer.visible = false
 
 	var my_start := global_position
 	var visitor_start := visitor.global_position
@@ -302,6 +298,9 @@ func swap_with(visitor: Node3D) -> void:
 		_snap_feet(visitor)
 		swapping = false
 		_recovering = true
+		var tracer := visitor.get_node_or_null("Tracer") as Node3D
+		if tracer != null:
+			tracer.visible = false
 		get_tree().paused = false
 		if other != null:
 			get_tree().create_timer(0.2, false, true).timeout.connect(func() -> void:
